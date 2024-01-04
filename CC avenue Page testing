@@ -1,0 +1,152 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from time import sleep
+import time
+from termcolor import colored
+import pandas as pd
+from datetime import date
+from openpyxl import load_workbook
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+import pickle
+import os.path
+import base64
+import email
+from bs4 import BeautifulSoup
+driver = webdriver.Chrome(executable_path=r"C:\Users\Alak\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+driver.maximize_window()
+driver.get("https://www.gempundit.com/")
+driver.implicitly_wait(3)
+
+
+action = ActionChains(driver);
+
+parent_level_menu = driver.find_element (By.LINK_TEXT, "GEMSTONES")
+action.move_to_element(parent_level_menu).perform()
+
+child_level_menu = driver.find_element (By.LINK_TEXT, "Yellow Sapphire - Pukhraj")
+child_level_menu.click();
+
+driver.implicitly_wait(10)
+
+driver.execute_script("window.scrollTo(0, 1600)","")
+
+########### open product detail Page ##############################
+
+ClickedProduct=driver.find_element_by_link_text("YELLOW SAPPHIRE - BANGKOK (ECONOMY)").text
+print(colored(" Clicked Product name: ","red"),ClickedProduct)
+
+Productdetail=driver.find_element_by_link_text("YELLOW SAPPHIRE - BANGKOK (ECONOMY)").click()
+time.sleep(2)
+Product_detail_page_title = driver.title
+print(colored(" Product Detail Page Title: ","red"), Product_detail_page_title)
+
+
+################## select all the options#################
+
+time.sleep(2)
+weight=driver.find_element_by_id("select_5561526")
+drp= Select(weight)
+drp.select_by_index(2)
+all_options=drp.options
+
+certification= driver.find_element_by_id("select_5561494")
+drp_cert=Select(certification)
+drp_cert.select_by_index(2)
+
+pooja=driver.find_element_by_id("select_5561495")
+drp_pj=Select(pooja)
+drp_pj.select_by_index(2)
+
+ring=driver.find_element_by_id("options_5561501_2").click()
+
+metal= driver.find_element_by_id("select_5561503")
+drp_metal=Select(metal)
+drp_metal.select_by_index(2)
+all_options_metal=drp_metal.options
+
+design=driver.find_element_by_id("options_5561507_3").click()
+
+size_system= driver.find_element_by_id("select_5561523")
+drp_size=Select(size_system)
+drp_size.select_by_index(2)
+all_options_size=drp_size.options
+
+size= driver.find_element_by_id("select_5561524")
+drp_stype=Select(size)
+drp_stype.select_by_index(6)
+all_options_stype=drp_stype.options
+
+time.sleep(2)
+
+# Add product in cart #
+addtocart=driver.find_element_by_id("addtobagcart").click()
+time.sleep(5)
+
+#####Mini cart function######
+time.sleep(10)
+driver.refresh()
+time.sleep(5)
+MyBag_icon_click=driver.find_element_by_id("custom_mincart").click()
+time.sleep(3)
+driver.find_element(By.LINK_TEXT, "CHECKOUT").click()
+time.sleep(5)
+
+cols= driver.find_element_by_id("login:guest").click()
+First_name=driver.find_element_by_id("billing:firstname")
+
+Last_name=driver.find_element_by_id("billing:lastname")
+
+email=driver.find_element_by_id("billing:email")
+
+Phone=driver.find_element_by_id("billing:telephone")
+
+Addressline1=driver.find_element_by_id("billing:street1")
+
+Addressline2=driver.find_element_by_id("billing:street2")
+
+City=driver.find_element_by_id("billing:city")
+
+Zipcode=driver.find_element_by_id("billing:postcode")
+
+Country_name = driver.find_element_by_id("billing:country_id")
+country_dd = Select(Country_name)
+country= country_dd.first_selected_option.text
+country1 = country.replace(" ","")
+
+First_name.send_keys("Test")
+Last_name.send_keys("Test")
+email.send_keys("alak@gempundit.com")
+
+Phone.send_keys("9876543210")
+Addressline1.send_keys("Test")
+Addressline2.send_keys("Test")
+
+State13= driver.find_element_by_id("billing:region_id")
+drp=Select(State13)
+drp.select_by_index(13)
+all_options_state=drp.options
+
+City.send_keys("Gurgaon")
+Zipcode.send_keys("122003")
+Clickcontinue=driver.find_element_by_id("custom_checkstate").click()
+Continuebutton=driver.find_element_by_id("custom_checkstate")
+print(colored("17- Open the checkout page & check all address text columns are reflecting", "red"), Continuebutton.is_enabled())
+time.sleep(6)
+shipping_button=driver.find_element_by_xpath("/html/body/div[3]/div/div[2]/div[3]/div/div[1]/ol/li[4]/div[2]/form/div[3]/button").click()
+time.sleep(10)
+driver.execute_script("window.scrollTo(0, 400)","")
+po_click=driver.find_element_by_xpath("/html/body/div[3]/div/div[2]/div[3]/div/div[1]/ol/li[5]/div[2]/form/div/dl/div[5]/button").click()
+time.sleep(20)
+
+print(colored(" 19- check CC avenue page is getting open", "red"),driver.title)
+
+#amount = driver.find_element_by_xpath("/html/body/form/div/div[2]/div/div[4]/div/div/div[1]/div/div[7]/span/strong").text
+amount = driver.find_element_by_css_selector("#amount > span > strong")
+print(amount)
+
+#amount > span > strong

@@ -1,0 +1,27 @@
+import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.common. by import By
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.remote.webelement import WebElement
+from time import sleep
+import time
+
+driver = webdriver.Chrome(executable_path=r"C:\Users\Alak\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+
+df = pd.read_csv(r'C:\Users\Alak\PycharmProjects\Basic command\CSV_File.csv')
+print(len(df))
+for i in range(len(df)):
+    #print(df.loc[i, "Links"])
+    link = df.loc[i, "Links"]
+    driver.get(df.loc[i, "Links"])
+    x = driver.get(df.loc[i, "Links"])
+    if driver.title == "404 Not Found":
+        print(df.loc[i, "Links"], "is not working")
+    else:
+        print(df.loc[i, "Links"], "is working")
+
+    sleep(2)
+    driver.implicitly_wait(10)
+
+driver.quit()

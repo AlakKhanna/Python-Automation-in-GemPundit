@@ -1,0 +1,77 @@
+from selenium import webdriver
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.by import By
+import time
+
+
+driver = webdriver.Chrome(executable_path=r"C:\Users\Alak\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+driver.get("https://www.gempundit.com/gemstones/emerald/emerald-brazil-premium-quality")
+driver.implicitly_wait(10)
+weight=driver.find_element_by_id("select_779227")
+drp=Select(weight)
+#drp.select_by_index(2)
+#drp.select_by_value("11185022")
+drp.select_by_visible_text("3.25 ratti (2.93 carat) Rs.2,352")
+print(len(drp.options))
+all_options=drp.options
+for option in all_options:
+        print(option.text)
+
+certification= driver.find_element_by_id("select_1013692")
+drp=Select(certification)
+drp.select_by_visible_text("Lab Certificate - GTL Jaipur ( Extra 4 Days) +Rs.1,500")
+print(len(drp.options))
+all_options=drp.options
+for option in all_options:
+  print(option.text)
+
+pooja=driver.find_element_by_id("select_23261")
+drp=Select(pooja)
+drp.select_by_index(2)
+print(len(drp.options))
+all_options=drp.options
+for option in all_options:
+        print(option.text)
+
+ring=driver.find_element_by_id("options_2489996_2").click()
+print(ring)
+
+metal= driver.find_element_by_id("select_2489998")
+drp=Select(metal)
+drp.select_by_index(2)
+print(len(drp.options))
+all_options=drp.options
+for option in all_options:
+        print(option.text)
+
+design=driver.find_element_by_id("options_2490002_3").click()
+print(design)
+
+size_system= driver.find_element_by_id("select_2490017")
+drp=Select(size_system)
+drp.select_by_index(2)
+print(len(drp.options))
+all_options=drp.options
+for option in all_options:
+        print(option.text)
+
+size= driver.find_element_by_id("select_2490018")
+drp=Select(size)
+drp.select_by_index(6)
+print(len(drp.options))
+all_options=drp.options
+for option in all_options:
+        print(option.text)
+
+time.sleep(5)
+
+driver.find_element_by_xpath("/html/body/div[3]/div/div[2]/div[2]/div/div[3]/div[5]/div/div[1]/form/div[3]/div[5]/div[1]/div[2]/input").click()
+driver.find_element(By.LINK_TEXT, "MY BAG").click()
+time.sleep(5)
+driver.find_element_by_xpath("/html/body/div[3]/div/div[2]/header/div[1]/div/div[3]/ul/li[5]/div/div/div[3]/div[1]/ul/li/div/a").click()
+time.sleep(5)
+#driver.switch_to_alert().accept()
+driver.switch_to_alert().dismiss()
+
+
+

@@ -1,0 +1,549 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from time import sleep
+import time
+from termcolor import colored
+import pandas as pd
+from datetime import date
+from openpyxl import load_workbook
+driver = webdriver.Chrome(executable_path=r"C:\Users\Alak\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+driver.maximize_window()
+driver.get("https://www.gempundit.com/")
+driver.implicitly_wait(10)
+
+##############login Account  ####################
+
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+time.sleep(5)
+
+Clicklogin=driver.find_element_by_link_text("Log In").click()
+time.sleep(5)
+
+user_name = driver.find_element_by_id("email")
+user_password = driver.find_element_by_id("pass")
+user_name.send_keys("alak@gempundit.com")
+user_password.send_keys("Qwerty@123")
+click_login_button= driver.find_element_by_id("send2").click()
+
+navigation_start = driver.execute_script("return window.performance.timing.navigationStart")
+dom_complete = driver.execute_script(" return window.performance.timing.domComplete")
+total_time = dom_complete - navigation_start
+print(colored("Account page Load Time after clicking on login button:","green"),total_time,"ms")
+
+driver.implicitly_wait(20)
+account_page_title=driver.title
+if account_page_title=="My Account | GemPundit.com":
+    print(colored("Login Successful!","green"))
+else:
+    print(colored("Login Unsuccessful","red"))
+
+#########Check order history#################
+time.sleep(10)
+order_history= driver.find_element_by_id("my-orders-table").text
+print(order_history)
+
+#######acount log out############
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+Logout= driver.find_element_by_link_text("Logout").click()
+time.sleep(2)
+logoutpage= driver.find_element_by_class_name("page-title").text
+print(colored("Logout page title","green"), logoutpage)
+time.sleep(10)
+
+# Search iCon - dd window with product name and category #
+driver.implicitly_wait(5)
+Open_search_icon= driver.find_element_by_class_name("fa-search").click()
+Type_In_searchbox= driver.find_element_by_id("search").send_keys("Blue Sapphire")
+listelements=driver.find_elements(By.XPATH, "//*[@id='search_autocomplete']/ul/li")
+list_ele=[]
+for a in range(len(listelements)):
+    k=listelements[a].text
+    if k!="":
+        list_ele.append(k)
+print(colored("3- Check after typing name in the search section, the dropdown window should reflect with the product name & category:","green"),list_ele)
+
+#####################Open category page ##############
+action = ActionChains(driver);
+
+parent_level_menu = driver.find_element (By.LINK_TEXT, "GEMSTONES")
+action.move_to_element(parent_level_menu).perform()
+
+child_level_menu = driver.find_element (By.LINK_TEXT, "Blue Sapphire (Neelam)")
+child_level_menu.click();
+
+#####Check H1 header##################################
+time.sleep(10)
+H1 = driver.find_elements_by_tag_name("h1")
+print(colored("Total H1 Tags on Blue Sapphire Category page:", "green"),len(H1))
+time.sleep(5)
+
+H2 = driver.find_elements_by_tag_name("h2")
+print(colored("Total H2 Tags on Blue Sapphire Category page:", "green"),len(H2))
+time.sleep(5)
+
+####### Check all sections are reflecting###########
+driver.execute_script("window.scrollTo(0, 100)","")
+Ring = driver.find_element_by_link_text("BLUE SAPPHIRE RINGS").text
+Pendant = driver.find_element_by_link_text("BLUE SAPPHIRE PENDANTS").text
+Bracelet = driver.find_element_by_link_text("BLUE SAPPHIRE BRACELETS").text
+driver.execute_script("window.scrollTo(0, 550)","")
+driver.implicitly_wait(3)
+Online_collection = driver.find_element_by_class_name("collectionHead").text
+print(colored("6-Check all 3 sections should reflect (Jewellery & online collection):","green"),Ring,",",Pendant ,",", Bracelet, ",", Online_collection)
+####total product before filter######
+driver.execute_script("window.scrollTo(0, 700)","")
+total_products= driver.find_element_by_class_name("product-number").text
+print(colored("Before filter Selection, total products count:", "green"), total_products)
+##############Check all filter###########################
+driver.execute_script("window.scrollTo(1600, 0)","")
+time.sleep(3)
+price_1filter= driver.find_element_by_class_name("m-to").clear()
+time.sleep(2)
+price_filter= driver.find_element_by_class_name("m-to").send_keys("100000")
+clickanywhere=driver.find_element_by_xpath("//*[@id='narrow-by-list-0']/div/div/li[3]/div[2]/ol/li[1]").click()
+time.sleep(7)
+Origin_filter= driver.find_element_by_xpath("//*[@id='narrow-by-list-0']/div/div/li[3]/div[2]/ol/li[1]").click()
+time.sleep(7)
+driver.refresh()
+time.sleep(3)
+driver.refresh()
+time.sleep(3)
+driver.refresh()
+time.sleep(3)
+
+treatment_filter= driver.find_element_by_xpath("//*[@id='narrow-by-list-0']/div/div/li[4]/div[2]/ol/li[1]/a").click()
+time.sleep(5)
+driver.refresh()
+time.sleep(7)
+driver.execute_script("window.scrollTo(0, 400)","")
+clickonslidebutton=driver.find_element_by_class_name("slick-next").click()
+driver.implicitly_wait(5)
+time.sleep(4)
+clickonslidebutton=driver.find_element_by_xpath("//*[@id='narrow-by-list-0']/button[2]").click()
+time.sleep(2)
+driver.execute_script("window.scrollTo(0, 250)","")
+shape_filter= driver.find_element_by_xpath("//*[@id='narrow-by-list-0']/div/div/li[9]/div[2]/ol/li[1]/a").click()
+time.sleep(5)
+Print_selcted_filter= driver.find_element_by_class_name("currently").text
+print(Print_selcted_filter)
+time.sleep(2)
+driver.refresh()
+driver.execute_script("window.scrollTo(0, 700)","")
+total_products= driver.find_element_by_class_name("product-number").text
+print(colored("After filter Selection, total products count:", "green"), total_products)
+
+########## Print SKU IDS for 2 pages ###########################
+Page_1 = driver.find_elements_by_class_name("sku_container")
+page_1_ops=[]
+for span in range(len(Page_1)):
+    span1 = Page_1[span].text
+    page_1_ops.append(span1)
+print(colored("Page 1 product's SKU IDs for","green"),len(Page_1),colored("products:","green"),page_1_ops)
+
+driver.execute_script("window.scrollTo(0, 2000)","")
+Move_page2= driver.find_element_by_link_text("2").click()
+time.sleep(7)
+
+Page_2 = driver.find_elements_by_class_name("sku_container")
+page_2_ops=[]
+for span2 in range(len(Page_2)):
+    span3 = Page_2[span2].text
+    page_2_ops.append(span3)
+print(colored("Page 2 product's SKU IDs for","green"),len(Page_2),colored("products:","green"),page_2_ops)
+time.sleep(5)
+
+driver.execute_script("window.scrollTo(0, 2000)","")
+Move_page3= driver.find_element_by_link_text("3").click()
+time.sleep(7)
+Page_3 = driver.find_elements_by_class_name("sku_container")
+page_3_ops=[]
+for span4 in range(len(Page_3)):
+    span5 = Page_3[span4].text
+    page_3_ops.append(span5)
+print(colored("Page 3 product's SKU IDs for","green"),len(Page_2),colored("products:","green"),page_3_ops)
+time.sleep(5)
+driver.refresh()
+time.sleep(3)
+driver.refresh()
+time.sleep(3)
+driver.refresh()
+time.sleep(3)
+driver.refresh()
+time.sleep(3)
+driver.refresh()
+time.sleep(3)
+
+action = ActionChains(driver);
+
+parent_level_menu = driver.find_element (By.LINK_TEXT, "GEMSTONES")
+action.move_to_element(parent_level_menu).perform()
+
+child_level_menu = driver.find_element (By.LINK_TEXT, "Blue Sapphire (Neelam)")
+child_level_menu.click();
+time.sleep(3)
+
+driver.execute_script("window.scrollTo(0, 900)","")
+
+####Click wishlist icon#############
+time.sleep(3)
+driver.execute_script("window.scrollTo(0, 700)","")
+
+Wishlist = driver.find_elements_by_class_name("whishlist-icon")
+for x in range(0,6):
+    if Wishlist[x].is_displayed():
+        Wishlist[x].click()
+print(colored("CLicked 6 wishlist icons on Amethyst category & all are working","green"))
+
+
+time.sleep(2)
+driver.refresh()
+time.sleep(2)
+driver.refresh()
+time.sleep(2)
+driver.refresh()
+time.sleep(2)
+driver.refresh()
+
+##################Play video############################
+
+driver.execute_script("window.scrollTo(0, 1200)","")
+driver.execute_script("window.scrollTo(0, 700)","")
+playVideo = driver.find_elements_by_class_name("playVideo")
+for x in range(0,7):
+    if playVideo[x].is_displayed():
+        playVideo[x].click()
+        time.sleep(3)
+        driver.find_element_by_class_name("fancybox-close").click()
+time.sleep(8)
+print(colored("CLicked 6 Video icons on Amethyst category & all are working","green"))
+
+####Configurable product one line description###########
+
+driver.execute_script("window.open('https://www.gempundit.com', 'new window')")
+window_after = driver.window_handles[1]
+
+driver.switch_to.window(window_after)
+time.sleep(10)
+
+driver.refresh()
+time.sleep(5)
+driver.refresh()
+time.sleep(5)
+driver.refresh()
+time.sleep(5)
+
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.LINK_TEXT, "GEMSTONES")
+action.move_to_element(parent_level_menu).perform()
+child_level_menu = driver.find_element (By.LINK_TEXT, "Red Coral (Moonga)")
+child_level_menu.click()
+time.sleep(3)
+
+driver.execute_script("window.scrollTo(0, 1050)","")
+Configurable_descrptn= driver.find_elements_by_class_name("product_short_desc")
+print(colored ("Total configurable products one line descriptions are  mentioned:", "green"), len(Configurable_descrptn))
+time.sleep(3)
+
+####open any product##################
+click_product= driver.find_element_by_link_text("RED CORAL - CAPSULE").click()
+time.sleep(3)
+driver.execute_script("window.scrollTo(0, 1400)","")
+
+#########Fill call back form##########
+name=driver.find_element_by_id("name").send_keys("test")
+email=driver.find_element_by_id("email").send_keys("alak@gempundit.com")
+telephone=driver.find_element_by_id("telephone").send_keys("9876543210")
+comment= driver.find_element_by_id("comment").send_keys("test testtesttesttesttesttesttesttesttesttesttesttest")
+buttons_set= driver.find_element_by_id("callourexpert").click()
+time.sleep(3)
+messageresponse=driver.find_element_by_id("messageresponse").text
+print(colored("After call back form submission this meesage is reflecting:", "green"), messageresponse)
+time.sleep(3)
+####Click wishlist icon###########
+driver.execute_script("window.scrollTo(1400, 50)","")
+wishlistiocn=driver.find_element_by_id("staricon-46865").click()
+time.sleep(3)
+wishlist_DP=driver.find_element_by_class_name("cwishlist_productname").text
+
+if wishlist_DP== "Blue Sapphire - Economy":
+    print(colored("Wishlist icon is clickable on product detail page", "green"))
+else:
+    print(colored("Wishlist icon is not clickable on product detail page", "red"))
+time.sleep(5)
+#####Click on share icon#####
+parent = driver.current_window_handle
+
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.CLASS_NAME, "share-icon")
+action.move_to_element(parent_level_menu).perform()
+child_level_menu = driver.find_element (By.CLASS_NAME, "fa-facebook")
+child_level_menu.click()
+window_after = driver.window_handles[2]
+driver.switch_to.window(window_after)
+time.sleep(3)
+facebook=driver.title
+if facebook== "Facebook":
+    print(colored("Facebook share icon is working", "green"))
+else:
+    print(colored("Facebook share icon is notworking", "red"))
+driver.close()
+driver.switch_to.window(parent);
+
+time.sleep(2)
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.CLASS_NAME, "share-icon")
+action.move_to_element(parent_level_menu).perform()
+time.sleep(2)
+child_level_menu = driver.find_element (By.CLASS_NAME, "whatsup-icon")
+child_level_menu.click()
+window_after = driver.window_handles[2]
+driver.switch_to.window(window_after)
+time.sleep(3)
+WhatsApp=driver.title
+if WhatsApp== "WhatsApp":
+    print(colored("WhatsApp share icon is working", "green"))
+else:
+    print(colored("WhatsApp share icon is not working", "red"))
+driver.close()
+driver.switch_to.window(parent);
+
+time.sleep(2)
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.CLASS_NAME, "share-icon")
+action.move_to_element(parent_level_menu).perform()
+time.sleep(2)
+child_level_menu = driver.find_element (By.CLASS_NAME, "fa-pinterest")
+child_level_menu.click()
+window_after = driver.window_handles[2]
+driver.switch_to.window(window_after)
+time.sleep(3)
+pintinterest=driver.title
+if pintinterest== "Pinterest":
+    print(colored("Pinterest share icon is working", "green"))
+else:
+    print(colored("Pinterest share icon is not working", "red"))
+driver.close()
+driver.switch_to.window(parent);
+
+time.sleep(2)
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.CLASS_NAME, "share-icon")
+action.move_to_element(parent_level_menu).perform()
+child_level_menu = driver.find_element (By.XPATH, "//*[@id='product_addtocart_form']/div[3]/div[1]/div[1]/h1/ul/li[2]/i/div/ul/li[2]/a")
+child_level_menu.click()
+window_after = driver.window_handles[2]
+driver.switch_to.window(window_after)
+time.sleep(3)
+google=driver.title
+if google== "Sign in – Google accounts":
+    print(colored("Google Plus share icon is working", "green"))
+else:
+    print(colored("Google Plus share icon is not working", "red"))
+driver.close()
+driver.switch_to.window(parent);
+#########Add Sku product###############
+time.sleep(4)
+driver.back()
+time.sleep(3)
+driver.refresh()
+driver.execute_script("window.scrollTo(0, 1000)","")
+time.sleep(3)
+#####Close chat############
+
+# Click_sortby= driver.find_element_by_xpath("/html/body/div[3]/div/div[2]/div[2]/div/div[2]/div/div/div[7]/div/div[2]/div/a").click()
+# time.sleep(3)
+# driver.execute_script("window.scrollTo(0, 800)","")
+SKU_product= driver.find_element_by_link_text("RED CORAL 4.75 MM 0.32 CARATS").click()
+time.sleep(3)
+addtocart=driver.find_element_by_id("addtobagcart").click()
+time.sleep(5)
+viewcart=driver.find_element_by_link_text("VIEW CART").click()
+time.sleep(5)
+QTY=e= driver.find_element_by_xpath("//*[@id='shopping-cart-table']/tbody/tr/td[4]/input").clear()
+time.sleep(2)
+QTY_update= driver.find_element_by_xpath("//*[@id='shopping-cart-table']/tbody/tr/td[4]/input").send_keys("2")
+time.sleep(3)
+update= driver.find_element_by_name("update_cart_action").click()
+time.sleep(5)
+error_msg= driver.find_element_by_class_name("item-msg").text
+print(colored("If the user increase the quantity the SKU products in the view cart, the product should reflect out of stock", "green"),error_msg )
+time.sleep(3)
+remove_product=driver.find_element_by_xpath("//*[@id='shopping-cart-table']/tbody/tr/td[6]/a").click()
+time.sleep(8)
+driver.back()
+time.sleep(8)
+driver.back()
+time.sleep(8)
+driver.back()
+time.sleep(8)
+driver.back()
+time.sleep(8)
+driver.refresh()
+time.sleep(8)
+driver.execute_script("window.scrollTo(0, 500)","")
+time.sleep(2)
+click_product1= driver.find_element_by_link_text("RED CORAL - CAPSULE").click()
+time.sleep(3)
+driver.execute_script("window.scrollTo(0, 500)","")
+weight=driver.find_element_by_id("select_1461909")
+drp= Select(weight)
+drp.select_by_index(1)
+time.sleep(1)
+addtocart=driver.find_element_by_id("addtobagcart").click()
+time.sleep(3)
+#####Open Yellow saphire###############
+action = ActionChains(driver);
+
+parent_level_menu = driver.find_element (By.LINK_TEXT, "GEMSTONES")
+action.move_to_element(parent_level_menu).perform()
+
+child_level_menu = driver.find_element (By.LINK_TEXT, "Opal")
+child_level_menu.click();
+time.sleep(7)
+Currency=driver.find_element_by_id("select-currency")
+drp= Select(Currency)
+drp.select_by_index(60)
+time.sleep(5)
+driver.execute_script("window.scrollTo(0, 1500)","")
+time.sleep(5)
+ClickedProduct=driver.find_element_by_link_text("WHITE OPAL WITH FIRE - PREMIUM (ETHIOPIA)").click()
+
+time.sleep(5)
+weight=driver.find_element_by_id("select_76868")
+drp= Select(weight)
+drp.select_by_index(2)
+all_options=drp.options
+
+driver.execute_script("window.scrollTo(0, 400)","")
+
+certification= driver.find_element_by_id("select_995754")
+drp_cert=Select(certification)
+drp_cert.select_by_index(2)
+
+pooja=driver.find_element_by_id("select_23915")
+drp_pj=Select(pooja)
+drp_pj.select_by_index(2)
+all_options_pj=drp_pj.options
+
+# ring=driver.find_element_by_id("options_6745537_2").click()
+#
+# metal= driver.find_element_by_id("select_6745539")
+# drp_metal=Select(metal)
+# drp_metal.select_by_index(2)
+# all_options_metal=drp_metal.options
+#
+# design=driver.find_element_by_id("options_5808809_3").click()
+#
+# size_system= driver.find_element_by_id("select_5808825")
+# drp_size=Select(size_system)
+# drp_size.select_by_index(2)
+# all_options_size=drp_size.options
+#
+# size= driver.find_element_by_id("select_5808826")
+# drp_stype=Select(size)
+# drp_stype.select_by_index(6)
+# all_options_stype=drp_stype.options
+#
+# time.sleep(2)
+#
+# Add product in cart #
+addtocart=driver.find_element_by_id("addtobagcart").click()
+time.sleep(3)
+confirmation= driver.find_element_by_class_name("message_resp").text
+print (colored("13-After selecting all the mandatory fields, click on the 'Add to cart' button and check product is added to the cart :","green"), confirmation)
+time.sleep(5)
+driver.get("https://www.gempundit.com/checkout/cart/")
+time.sleep(5)
+coupon_box=driver.find_element_by_id("coupon_code").click()
+Coupon= driver.find_element_by_id("coupon_code").send_keys("GPQH7VDS")
+time.sleep(3)
+Apply_coupon=driver.find_element_by_xpath("//*[@id='discount-coupon-form']/div/div/div/div/button[1]/span/span").click()
+time.sleep(3)
+Coupon_confirmation= driver.find_element_by_xpath("//*[@id='discount-coupon-form']/div/div/div/span").text
+print(colored("After applied coupon this text is reflecting:","green"), Coupon_confirmation)
+time.sleep(3)
+driver.refresh()
+time.sleep(7)
+driver.find_element(By.XPATH,"//*[@id='top']/body/div[3]/div/div[3]/div[2]/div/div[2]/div/div[2]/div/div[2]/div/ul/li/button").click()
+time.sleep(5)
+cols= driver.find_element_by_id("login:guest").click()
+First_name=driver.find_element_by_id("billing:firstname")
+
+Last_name=driver.find_element_by_id("billing:lastname")
+
+email=driver.find_element_by_id("billing:email")
+
+Phone=driver.find_element_by_id("billing:telephone")
+
+Addressline1=driver.find_element_by_id("billing:street1")
+
+Addressline2=driver.find_element_by_id("billing:street2")
+
+City=driver.find_element_by_id("billing:city")
+
+Zipcode=driver.find_element_by_id("billing:postcode")
+
+Country_name = driver.find_element_by_id("billing:country_id")
+country_dd = Select(Country_name)
+country= country_dd.first_selected_option.text
+country1 = country.replace(" ","")
+
+First_name.send_keys("Test")
+Last_name.send_keys("Test")
+email.send_keys("alak@gempundit.com")
+
+Phone.send_keys("9876543210")
+Addressline1.send_keys("Ardee city")
+Addressline2.send_keys("52")
+
+Country= driver.find_element_by_id("billing:country_id")
+drp=Select(Country)
+drp.select_by_index(233)
+all_options_state=drp.options
+
+State13= driver.find_element_by_id("billing:region_id")
+drp=Select(State13)
+drp.select_by_index(18)
+all_options_state=drp.options
+
+City.send_keys("Orlando")
+Zipcode.send_keys("32805")
+Clickcontinue=driver.find_element_by_id("custom_checkstate").click()
+Continuebutton=driver.find_element_by_id("custom_checkstate")
+
+time.sleep(10)
+shipping_button=driver.find_element_by_id("shipping-method-buttons-container")
+shipping_button.click()
+driver.execute_script("window.scrollTo(0, 600)","")
+time.sleep(10)
+
+######### placed order in PAYPAL ##########
+
+PAYPAL= driver.find_element_by_id("p_method_paypal_standard").click()
+time.sleep(10)
+driver.execute_script("window.scrollTo(0, 1800)","")
+time.sleep(5)
+custom_duties= driver.find_element_by_id("agreement-1").click()
+time.sleep(5)
+driver.find_element_by_id("placeorderbutton").click()
+time.sleep(40)
+
+amountinPP= driver.find_element_by_class_name("ltrDisplay").text
+if amountinPP=="$132.64 USD":
+    print(colored(" After discount same amount is reflecting on PayPal","green"))
+else:
+    print(colored(" After discount same amount is not reflecting on PayPal","red"))
+time.sleep(5)
+
+
+
+# SEO_buttons= driver.find_element_by_class_name("tab").text
+# print(SEO_buttons)
+# if printh1=="Who Should Wear? Blue Sapphire Benefits Blue Sapphire Prices Blue Sapphire Quality FAQs":
+#     print(colored(" SEO Buttons are mapped under <h2> tag","green"))
+# else:
+#     print(colored(" SEO Buttons are mapped under <h2> tag","red"))

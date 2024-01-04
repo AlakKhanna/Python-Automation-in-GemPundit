@@ -1,0 +1,18 @@
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
+
+driver= webdriver.Chrome (executable_path= r"C:\Users\Alak\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+driver.get("https://www.gempundit.com/")  #HP
+print (driver.title)   #HP
+driver.get ("https://www.gempundit.com/gemstones/blue-sapphire") #CP
+time.sleep(5)
+print (driver.title)   #CP
+driver.back()
+time.sleep(5)
+print (driver.title)   #HP
+driver.forward()
+time.sleep(5)
+print (driver.title)   #CP\
+
+

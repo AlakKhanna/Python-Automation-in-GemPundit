@@ -1,0 +1,324 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait as wait
+from time import sleep
+import time
+from termcolor import colored
+import pandas as pd
+from datetime import date
+from openpyxl import load_workbook
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+import pickle
+import os.path
+import base64
+import email
+from bs4 import BeautifulSoup
+from termcolor import colored
+driver = webdriver.Chrome(executable_path=r"C:\Users\Alak\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+driver.maximize_window()
+driver.get("https://www.gempundit.com/index.php/00gxp9/sales_order/index/key/1e2db9311eeb6f0be1c9f70fd29a5524/")
+driver.implicitly_wait(10)
+
+MG_User= driver.find_element_by_id("username").send_keys("alak")
+time.sleep(2)
+MG_Password= driver.find_element_by_id("login").send_keys("V8NA0uGTPMVvl9fa")
+time.sleep(1)
+click_login= driver.find_element_by_class_name("form-button").click()
+time.sleep(5)
+
+# Define the SCOPES. If modifying it, delete the token.pickle file.
+SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+
+
+def getEmails():
+    creds = None
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    # connect to gmail API
+    service = build('gmail', 'v1', credentials=creds)
+
+    # request a list of all the messages
+    result = service.users().messages().list(maxResults=1, userId='me', labelIds=['INBOX']).execute()
+
+    # We can also pass maxResults to get any number of emails. Like this
+    # result = service.users().messages().list(maxResults=200, userId='me').execute()
+    messages = result.get('messages')
+    # print(messages)
+    id1 = messages[0]['id']
+    # print(id1)
+
+    txt = service.users().messages().get(userId='me', id=id1).execute()
+    # print(txt)
+
+    payload = txt['payload']
+    headers = payload['headers']
+    # parts = payload.get('partId')[0]
+    mssg_parts = payload['body']['data']
+    data = mssg_parts.replace("-", "+").replace("_", "/")
+    decoded_data = base64.b64decode(data)
+    soup = BeautifulSoup(decoded_data, "lxml")
+    body = soup.body()
+    OTP1 = soup.select_one('p:contains("OTP")')
+    # print(str(OTP1)[6:10])
+    # print(body)
+
+    # Look for Subject and Sender Email in the headers
+    for d in headers:
+        if d['name'] == 'Subject':
+            subject = d['value']
+        if d['name'] == 'From':
+            sender = d['value']
+    if subject == 'GemPundit : Magento Login OTP':
+        print(colored("Subject - ", "green"), subject)
+        print(colored("Sender - ", "green"), sender)
+        print(colored("OTP - ", "green"), str(OTP1)[6:10])
+    else:
+        print(colored("OTP Mail not found", "red"))
+    Put_OTP = driver.find_element_by_id("otp").send_keys(str(OTP1)[6:10])
+    time.sleep(7)
+    Confirm_login = driver.find_element_by_xpath("//*[@id='loginForm']/div/div[6]/input[2]").click()
+
+
+getEmails()
+
+time.sleep(3)
+driver.refresh()
+#####open order page##############
+action = ActionChains(driver);
+
+parent_level_menu = driver.find_element (By.LINK_TEXT, "Sales")
+action.move_to_element(parent_level_menu).perform()
+
+child_level_menu = driver.find_element (By.LINK_TEXT, "Orders")
+child_level_menu.click();
+time.sleep(6)
+
+####Click create new order#####
+
+Create_order= driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/div[2]/table/tbody/tr/td[2]/button").click()
+time.sleep(3)
+Search_email= driver.find_element_by_id("sales_order_create_customer_grid_filter_email").send_keys("alak@gempundit.com")
+time.sleep(4)
+click_serach= driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/form/div[3]/div/div[2]/div/table/tbody/tr/td[2]/button[2]").click()
+time.sleep(5)
+Click_profile=driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/form/div[3]/div/div[2]/div/div/div/table/tbody").click()
+time.sleep(5)
+Click_english= driver.find_element_by_id("store_1").click()
+time.sleep(180)
+driver.implicitly_wait(10)
+############Change currency##############
+
+Change_currency= driver.find_element_by_id("currency_switcher")
+drp= Select(Change_currency)
+drp.select_by_index(60)
+time.sleep(120)
+Change_currency= driver.find_element_by_id("currency_switcher")
+drp= Select(Change_currency)
+drp.select_by_index(60)
+time.sleep(120)
+#########Click add product button
+Click_Addproduct= driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/form/div[5]/div/div/table/tbody/tr/td[2]/div[3]/div/div[1]/div/button").click()
+time.sleep(3)
+###Search & add product############
+Search_product= driver.find_element_by_id("sales_order_create_search_grid_filter_sku").send_keys("GP67413")
+time.sleep(3)
+CLick_search= driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/form/div[5]/div/div/table/tbody/tr/td[2]/div[2]/div/div[2]/div/table/tbody/tr/td[2]/button[2]").click()
+time.sleep(5)
+CLick_product=driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/form/div[5]/div/div/table/tbody/tr/td[2]/div[2]/div/div[2]/div/div/div/table/tbody").click()
+time.sleep(5)
+
+weight=driver.find_element_by_id("select_4189792")
+drp= Select(weight)
+drp.select_by_index(2)
+
+certification= driver.find_element_by_id("select_1529331")
+drp_cert=Select(certification)
+drp_cert.select_by_index(2)
+
+pooja=driver.find_element_by_id("select_1529332")
+drp_pj=Select(pooja)
+drp_pj.select_by_index(2)
+
+ring=driver.find_element_by_id("options_5808803_2").click()
+time.sleep(2)
+driver.execute_script("window.scrollTo(0, 400)","")
+
+metal= driver.find_element_by_id("select_5808805")
+drp_metal=Select(metal)
+drp_metal.select_by_index(2)
+all_options_metal=drp_metal.options
+time.sleep(2)
+driver.execute_script("window.scrollTo(400, 950)","")
+
+design=driver.find_element_by_id("options_5808809_3").click()
+time.sleep(2)
+driver.execute_script("window.scrollTo(9500, 1200)","")
+
+size_system= driver.find_element_by_id("select_5808825")
+drp_size=Select(size_system)
+drp_size.select_by_index(2)
+all_options_size=drp_size.options
+
+time.sleep(2)
+driver.execute_script("window.scrollTo(1200, 1300)","")
+size= driver.find_element_by_id("select_5808826")
+drp_stype=Select(size)
+drp_stype.select_by_index(6)
+all_options_stype=drp_stype.options
+
+time.sleep(2)
+
+Click_Ok= driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/div[4]/form/div/div[6]/button[2]").click()
+time.sleep(5)
+driver.execute_script("window.scrollTo(1200, 0)","")
+time.sleep(2)
+Click_addproduct= driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/form/div[5]/div/div/table/tbody/tr/td[2]/div[2]/div/div[1]/div/button").click()
+time.sleep(10)
+
+######place order##############
+apply_discount= driver.find_element_by_id("customDiscount").click()
+time.sleep(6)
+input_discount_value= driver.find_element_by_id("custom_discount").send_keys("1000")
+time.sleep(2)
+Click_apply= driver.find_element_by_id("apply").click()
+time.sleep(2)
+mention_reason= driver.find_element_by_id("reason").send_keys("abc")
+time.sleep(2)
+Select_approval= driver.find_element_by_id("discount-permission").click()
+time.sleep(2)
+Click_confirm= driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/form/div[5]/div/div/table/tbody/tr/td[2]/div[3]/div/div/div[2]/div[2]/div[2]/div[1]/fieldset/div/ul/li[2]/button").click()
+time.sleep(3)
+driver.execute_script("window.scrollTo(0, 600)","")
+time.sleep(2)
+
+Address=driver.find_element_by_id("order-billing_address_customer_address_id")
+drp= Select(Address)
+drp.select_by_index(2)
+time.sleep(8)
+driver.execute_script("window.scrollTo(600, 900)","")
+select_BT= driver.find_element_by_id("p_method_banktransfer").click()
+time.sleep(7)
+Select_dispatch=driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/form/div[5]/div/div/table/tbody/tr/td[2]/div[8]/div[2]/div/div/div[2]/div[1]/a").click()
+time.sleep(7)
+select_dispatch_optn= driver.find_element_by_id("s_method_matrixrate_matrixrate_24875").click()
+driver.execute_script("window.scrollTo(900, 1200)","")
+time.sleep(8)
+Click_submit= driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/form/div[5]/div/div/table/tbody/tr/td[2]/div[14]/div[2]/div/div[2]/p[3]/button").click()
+time.sleep(100)
+#######print mail#######
+#############order confirmation mail from email######################################
+time.sleep(10)
+SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+
+
+def getEmails_oc():
+    creds = None
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    # connect to gmail API
+    service = build('gmail', 'v1', credentials=creds)
+
+    # request a list of all the messages
+    result = service.users().messages().list(maxResults=1, userId='me', labelIds=['INBOX']).execute()
+
+    # We can also pass maxResults to get any number of emails. Like this
+    # result = service.users().messages().list(maxResults=200, userId='me').execute()
+    messages = result.get('messages')
+    # print(messages)
+    id1 = messages[0]['id']
+    # print(id1)
+
+    txt = service.users().messages().get(userId='me', id=id1).execute()
+    # print(txt)
+
+    payload = txt['payload']
+    headers = payload['headers']
+    # print(headers)
+    # parts = payload.get('parts')
+    # print(parts)
+    mssg_parts = payload['body']['data']
+    data = mssg_parts.replace("-", "+").replace("_", "/")
+    decoded_data = base64.b64decode(data)
+    soup = BeautifulSoup(decoded_data, "lxml")
+    body = soup.body()
+    # price = soup.select_one('td:contains("price")')
+    price = soup.select_one("span[class*=price]").text
+    # print(price)
+
+    for d in headers:
+        if d['name'] == 'Subject':
+            subject = d['value']
+            # print("Subject:",subject)
+        if d['name'] == 'From':
+            sender = d['value']
+            # print("Sender:",sender)
+
+    if subject.startswith("GemPundit.com: New Order #"):
+        print(colored("Order Number:", "green"), subject[len(subject) - 9:])
+        print(colored("Order Price:", "green"), price)
+
+
+getEmails_oc()
+############Change status##############
+driver.execute_script("window.scrollTo(0, 2000)","")
+Change_status= driver.find_element_by_id("history_status")
+drp= Select(Change_status)
+drp.select_by_index(1)
+time.sleep(1)
+
+Comment= driver.find_element_by_id("history_comment").send_keys("Test")
+time.sleep(2)
+Advance_option= driver.find_element_by_id("advance_options").click()
+time.sleep(1)
+Notify_customer= driver.find_element_by_id("history_notify").click()
+time.sleep(1)
+Submit_comment= driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/div/div[2]/div/div[4]/div[1]/div/div[17]/div/fieldset/div/div[1]/div[3]/button").click()
+time.sleep(8)
+driver.execute_script("window.scrollTo(2000, 0)","")
+
+######Create invoice#######################
+Click_invoice= driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/div/div[2]/div/div[3]/p/button[6]").click()
+time.sleep(5)
+driver.execute_script("window.scrollTo(0, 2000)","")
+time.sleep(1)
+doc_verify= driver.find_element_by_id("document_collected").click()
+time.sleep(3)
+Submit_invoice=driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/form/div[12]/div[6]/div[2]/div/div[3]/button").click()
+time.sleep(30)
+Click_invoice_button= driver.find_element_by_id("sales_order_view_tabs_order_invoices").click()
+time.sleep(5)
+Download_invoice= driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/div/div[2]/div/div[4]/div[2]/div/div/div/table/tbody").click()
+time.sleep(5)
+Click_print= driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/div[2]/p/button[3]").click()
+
+
+

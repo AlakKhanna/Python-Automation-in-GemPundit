@@ -1,0 +1,167 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.action_chains import ActionChains
+from time import sleep
+import time
+from termcolor import colored
+from bs4 import BeautifulSoup
+import requests
+
+## open the website####
+driver = webdriver.Chrome(executable_path=r"C:\Users\Alak\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+driver.maximize_window()
+driver.get("https://www.gempundit.com/gemstones/amethyst/amethyst-any-premium-quality-rectangular")
+driver.implicitly_wait(10)
+
+### Click on gempundit logo###
+
+Click_logo= driver.find_element_by_class_name("logo").click()
+time.sleep(3)
+Click_logo1= driver.title
+if Click_logo1== "Buy Gemstones Online: Loose Gemstones for sale - Best Gemstones Prices | GemPundit.com":
+    print(colored("After click on logo Home Page is open", "green"))
+else:
+    print(colored("After click on logo another Page is open", "green"))
+time.sleep(5)
+driver.back()
+time.sleep(3)
+
+####check breadcrumbs####
+breadcrumbs= driver.find_element_by_class_name("""breadcrumbs""").text
+print(colored("Whole breadcrumbs on category page", "green"), breadcrumbs)
+
+click_home= driver. find_element_by_link_text("Home").click()
+time.sleep(3)
+click_home1= driver.title
+if click_home1== "Buy Gemstones Online: Loose Gemstones for sale - Best Gemstones Prices | GemPundit.com":
+    print(colored("Home breadcrumbs text is clickable & landing on correct page", "green"))
+else:
+    print(colored("Home breadcrumbs, text is not clickable", "red"))
+driver.back()
+time.sleep(3)
+
+click_gemstone= driver. find_element_by_link_text("Gemstones").click()
+time.sleep(3)
+click_gemstone1= driver.title
+if click_gemstone1== "Gemstones List: Gemstone Names by Color and Type | GemPundit.com":
+    print(colored("Gemstones breadcrumbs text is clickable & landing on correct page", "green"))
+else:
+    print(colored("Gemstones breadcrumbs, text is not clickable", "red"))
+driver.back()
+time.sleep(3)
+
+####CLick all thumbnail#####
+driver.execute_script("window.scrollTo(0, 200)","")
+Thumbnails = driver.find_elements_by_class_name("product_thumb_forHeight")
+for x in range(0,6):
+    if Thumbnails[x].is_displayed():
+        Thumbnails[x].click()
+        time.sleep(2)
+print( colored("ALl thumbnail images are clickable", "green"))
+
+Video_Thumbnails = driver.find_elements_by_class_name("video_CDN_Thumb")
+for x in range(0,2):
+    if Video_Thumbnails[x].is_displayed():
+        Video_Thumbnails[x].click()
+        time.sleep(2)
+        driver.find_element_by_class_name("fancybox-close").click()
+        time.sleep(2)
+print( colored("ALl thumbnail Videos are clickable", "green"))
+
+####Click on wishlist icon#####
+driver.execute_script("window.scrollTo(200, 0)","")
+
+time.sleep(3)
+Wishlist = driver.find_element_by_class_name("whishlist-icon-view").click()
+time.sleep(6)
+
+####pirnt text#####
+
+print(colored("Below pages are open after click on Share icons", "green"))
+
+#####Click on facebook share icon#####
+parent = driver.current_window_handle
+
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.CLASS_NAME, "share-icon")
+action.move_to_element(parent_level_menu).perform()
+child_level_menu = driver.find_element (By.CLASS_NAME, "fa-facebook")
+child_level_menu.click()
+time.sleep(2)
+driver.switch_to.window(driver.window_handles[1])
+time.sleep(2)
+print(driver.title)
+time.sleep(2)
+driver.close()
+driver.switch_to.window(driver.window_handles[0])
+time.sleep(2)
+driver.refresh()
+time.sleep(2)
+driver.refresh()
+time.sleep(2)
+driver.refresh()
+time.sleep(2)
+
+#########Open whats app icon#######
+
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.CLASS_NAME, "share-icon")
+action.move_to_element(parent_level_menu).perform()
+time.sleep(2)
+child_level_menu = driver.find_element (By.CLASS_NAME, "whatsup-icon")
+child_level_menu.click()
+driver.switch_to.window(driver.window_handles[1])
+time.sleep(2)
+print(driver.title)
+time.sleep(2)
+driver.close()
+driver.switch_to.window(driver.window_handles[0])
+time.sleep(2)
+
+########open pin interest#########
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.CLASS_NAME, "share-icon")
+action.move_to_element(parent_level_menu).perform()
+time.sleep(2)
+child_level_menu = driver.find_element (By.CLASS_NAME, "fa-pinterest")
+child_level_menu.click()
+driver.switch_to.window(driver.window_handles[1])
+time.sleep(2)
+print(driver.title)
+time.sleep(2)
+driver.close()
+driver.switch_to.window(driver.window_handles[0])
+time.sleep(2)
+
+#######open google+ acount#########
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.CLASS_NAME, "share-icon")
+action.move_to_element(parent_level_menu).perform()
+child_level_menu = driver.find_element (By.XPATH, "//*[@id='product_addtocart_form']/div[3]/div[1]/div[1]/h1/ul/li[2]/i/div/ul/li[2]/a")
+child_level_menu.click()
+driver.switch_to.window(driver.window_handles[1])
+time.sleep(2)
+print(driver.title)
+time.sleep(2)
+driver.close()
+driver.switch_to.window(driver.window_handles[0])
+time.sleep(2)
+
+driver.execute_script("window.scrollTo(0, 1400)","")
+
+#########Fill call back form##########
+name=driver.find_element_by_id("name").send_keys("test")
+email=driver.find_element_by_id("email").send_keys("alak@gempundit.com")
+telephone=driver.find_element_by_id("telephone").send_keys("9876543210")
+comment= driver.find_element_by_id("comment").send_keys("test testtesttesttesttesttesttesttesttesttesttesttest")
+buttons_set= driver.find_element_by_id("callourexpert").click()
+time.sleep(3)
+
+#####print estimated shipping date######
+
+Dispatch_date= driver.find_element_by_class_name("estimated_date").text
+print(colored("This estimated Dispatch date is reflecting on product detail page :", "green"), Dispatch_date)
+
+driver.execute_script("window.scrollTo(1400, 100)","")
+ring=driver.find_element_by_id("options_7550936_2").click()

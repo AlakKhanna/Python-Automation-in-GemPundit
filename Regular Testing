@@ -1,0 +1,674 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from time import sleep
+import time
+from termcolor import colored
+import pandas as pd
+from datetime import date
+from openpyxl import load_workbook
+from googleapiclient.discovery import build
+# from google.flow import InstalledAppFlow
+from google_auth_oauthlib.flow import Flow
+from google.auth.transport.requests import Request
+import pickle
+import os.path
+import base64
+import email
+from bs4 import BeautifulSoup
+from selenium.webdriver.chrome.service import Service
+
+
+s= Service(executable_path=r"C:\Users\Alak\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+driver = webdriver.Chrome(service=s)
+driver.maximize_window()
+
+driver.get("https://www.gempundit.com/?85794hgfyguyguy")
+driver.implicitly_wait(10)
+#
+#
+# username = "catalog" # Replace the username
+# access_key = "8Z0BIANUiEukgAMPspUGtLql3CfBsstD84IH3QOL539A8yoICm" # Replace the access key
+#
+# desired_caps = {
+#              "build": 'PyunitTest sample build', # Change your build name here
+#              "name": 'Py-unittest', # Change your test name here
+#              "platform": 'Windows 10', # Change your OS version here
+#              "browserName": 'Chrome', # Change your browser here
+#              "version": '87.0', # Change your browser version here
+#              "resolution": '1024x768', # Change your resolution here
+#              "console": 'true', # Enable or disable console logs
+#              "network":'true'   # Enable or disable network logs
+#          }
+# driver=webdriver.Remote(
+#      command_executor="https://{}:{}@hub.lambdatest.com/wd/hub".format(username, access_key),
+#      desired_capabilities=desired_caps)
+#
+#
+#
+lst_excel=[]
+window_before = driver.window_handles[0]
+
+window_before_title = driver.title
+print(colored("This is the home page title reflecting:", "green"), window_before_title)
+line1="This is the home page title reflecting:", window_before_title
+lst_excel.append(line1)
+print(colored ("Website URL-", "green"), driver.current_url)
+today = date.today()
+
+line2="Website URL", driver.current_url
+lst_excel.append(line2)
+time.sleep(3)
+#
+# ##############Website Home page###############
+# Customer Care number and currency #
+currency = driver.find_element_by_id("select-currency")
+phone = driver.find_element_by_class_name("phone-box")
+cur_dd = Select(currency)
+cur= cur_dd.first_selected_option.text
+cur1 = cur.replace(" ","")
+ph= phone.text
+ph1 = ph.replace(" ","")
+print(colored("Check correct currency is reflecting? (Indian currency) :","green"),cur1[0:3],"\n",colored("2-Check if the Correct customer care number is reflecting?(Indian number)","green"),ph1)
+
+line3="Check correct currency is reflecting? (Indian currency)", cur1[0:3]
+lst_excel.append(line3)
+line4="Check if the Correct customer care number is reflecting?(Indian number)", ph1
+lst_excel.append(line4)
+
+# Search iCon - dd window with product name and category #
+driver.implicitly_wait(5)
+Open_search_icon= driver.find_element_by_class_name("fa-search").click()
+Type_In_searchbox= driver.find_element_by_id("search").send_keys("Emerald")
+time.sleep(4)
+listelements=driver.find_elements(By.XPATH, "//*[@id='search_autocomplete']/ul/li")
+list_ele=[]
+for a in range(len(listelements)):
+    k=listelements[a].text
+    if k!="":
+        list_ele.append(k)
+print(colored("3- Check after typing name in the search section, the dropdown window should reflect with the product name & category:","green"),list_ele)
+line6="3- Check after typing name in the search section, the dropdown window should reflect with the product name & category", list_ele
+lst_excel.append(line6)
+
+
+####scroll whole page  to check landing page is loading properly###################
+
+driver.execute_script("window.scrollTo(0, 300)","")
+time.sleep(2)
+driver.execute_script("window.scrollTo(0, 900)","")
+time.sleep(2)
+driver.execute_script("window.scrollTo(0, 1600)","")
+time.sleep(2)
+driver.execute_script("window.scrollTo(0, 2600)","")
+time.sleep(2)
+driver.execute_script("window.scrollTo(0, 3200)","")
+time.sleep(2)
+driver.execute_script("window.scrollTo(0, 4500)","")
+time.sleep(2)
+driver.execute_script("window.scrollTo(0, 6000)","")
+time.sleep(2)
+
+
+#####################Open category page ##############
+action = ActionChains(driver);
+
+parent_level_menu = driver.find_element (By.LINK_TEXT, "GEMSTONES")
+action.move_to_element(parent_level_menu).perform()
+
+child_level_menu = driver.find_element (By.LINK_TEXT, "Amethyst")
+child_level_menu.click();
+
+###################Wishlist & Play icon###########
+time.sleep(3)
+driver.execute_script("window.scrollTo(0, 700)","")
+
+Wishlist = driver.find_elements_by_class_name("whishlist-icon")
+for x in range(0,6):
+    if Wishlist[x].is_displayed():
+        Wishlist[x].click()
+print(colored("CLicked 6 wishlist icons on Amethyst category & all are working","green"))
+line5="CLicked 6 wishlist icons on Amethyst category & all are working"
+lst_excel.append(line5)
+###############play vide #########
+
+driver.execute_script("window.scrollTo(0, 700)","")
+playVideo = driver.find_elements_by_class_name("playVideo")
+for x in range(0,7):
+    if playVideo[x].is_displayed():
+        playVideo[x].click()
+        time.sleep(3)
+        driver.find_element_by_class_name("fancybox-close").click()
+time.sleep(8)
+print(colored("CLicked 6 Video icons on Amethyst category & all are working","green"))
+line6="CLicked 6 Video icons on Amethyst category & all are working"
+lst_excel.append(line6)
+########Catgepory Page information##############
+driver.execute_script("window.scrollTo(700, 200)","")
+time.sleep(2)
+######Click on ring ##########
+rings=driver.find_element_by_partial_link_text("RINGS").click()
+driver.switch_to.window(driver.window_handles[1])
+time.sleep(2)
+print(colored("Ring page title is clickable:","green"), driver.title)
+line7="Ring page title is clickable:", rings
+lst_excel.append(line7)
+time.sleep(10)
+driver.close()
+driver.switch_to.window(driver.window_handles[0])
+
+####Click on pendant####
+pendant=driver.find_element_by_partial_link_text("PENDANTS").click()
+driver.switch_to.window(driver.window_handles[1])
+# time.sleep(2)
+print(colored("Pendants page tittle is clickable:","green"), driver.title)
+line8="Pendants page tittle is clickable:", pendant
+lst_excel.append(line8)
+time.sleep(5)
+driver.close()
+driver.switch_to.window(driver.window_handles[0])
+
+###Click on bracelet option
+bracelet=driver.find_element_by_partial_link_text("BRACELETS").click()
+driver.switch_to.window(driver.window_handles[1])
+time.sleep(2)
+print(colored("Bracelet Page title is clickable:","green"), driver.title)
+line9="Bracelet Page title is clickable:", bracelet
+lst_excel.append(line9)
+time.sleep(2)
+driver.close()
+driver.switch_to.window(driver.window_handles[0])
+time.sleep(3)
+
+driver.execute_script("window.scrollTo(0, 100)","")
+Ring = driver.find_element_by_link_text("AMETHYST RINGS").text
+Pendant = driver.find_element_by_link_text("AMETHYST PENDANTS").text
+Bracelet = driver.find_element_by_link_text("AMETHYST BRACELETS").text
+driver.execute_script("window.scrollTo(0, 750)","")
+driver.implicitly_wait(10)
+QuickBuy=driver.find_elements_by_class_name("collectionHead")[0].text
+ClickedProduct=driver.find_element_by_link_text("AMETHYST - LUXURY").text
+
+driver.execute_script("window.scrollTo(0, 1600)","")
+Online_collection = driver.find_elements_by_class_name("collectionHead")[1].text
+print(colored("Sections Name on category page:", "green"),Ring,",",Pendant ,",", Bracelet, ",",QuickBuy, ",", Online_collection)
+line10="Sections Name on category page:", Ring, Pendant, Bracelet, QuickBuy, Online_collection
+lst_excel.append(line10)
+print(colored("Clicked Product name:","green"),ClickedProduct)
+line11="Clicked Product name:", ClickedProduct
+lst_excel.append(line11)
+time.sleep(3)
+driver.refresh()
+time.sleep(3)
+driver.refresh()
+time.sleep(3)
+driver.refresh()
+driver.execute_script("window.scrollTo(0, 700)","")
+Productdetail=driver.find_element_by_link_text("AMETHYST - LUXURY").click()
+time.sleep(3)
+driver.execute_script("window.scrollTo(0, 1400)","")
+
+#########Fill call back form##########
+name=driver.find_element_by_id("name").send_keys("test")
+email=driver.find_element_by_id("email").send_keys("alak@gempundit.com")
+telephone=driver.find_element_by_id("telephone").send_keys("9876543210")
+comment= driver.find_element_by_id("comment").send_keys("test testtesttesttesttesttesttesttesttesttesttesttest")
+buttons_set= driver.find_element_by_id("callourexpert").click()
+time.sleep(3)
+messageresponse=driver.find_element_by_id("messageresponse").text
+print(colored("After call back form submission this meesage is reflecting:", "green"), messageresponse)
+time.sleep(3)
+
+######Check Thumbnail is displayed###########
+
+driver.execute_script("window.scrollTo(0, 100)","")
+Thumbnails = driver.find_elements_by_class_name("product_thumb_forHeight")
+for x in range(0,7):
+    if Thumbnails[x].is_displayed():
+        Thumbnails[x].click()
+        time.sleep(2)
+print( colored("ALl thumbnail images are clickable", "green"))
+line12="ALl thumbnail images are clickable"
+lst_excel.append(line12)
+
+Video_Thumbnails = driver.find_elements_by_class_name("video_CDN_Thumb")
+for x in range(0):
+    if Video_Thumbnails[x].is_displayed():
+        Video_Thumbnails[x].click()
+        time.sleep(2)
+        driver.find_element_by_class_name("fancybox-close").click()
+        time.sleep(2)
+print( colored("ALl thumbnail Videos are clickable", "green"))
+line13="ALl thumbnail Videos are clickable"
+lst_excel.append(line13)
+#### CLick wishlist icon############
+
+
+Wishlisticon1 =driver.find_element_by_id("staricon-1291").click()
+if Wishlisticon1:
+    print(colored("Wishlist icon on Product detail page is clickable.", "green"))
+else:
+     print(colored("Wishlist icon on Product detail page is not clickable.", "red"))
+line14="Wishlist icon on Product detail page is not clickable.", Wishlisticon1
+lst_excel.append(line14)
+
+####Select custom options
+weight=driver.find_element_by_id("select_76884")
+drp= Select(weight)
+drp.select_by_index(33)
+
+certification= driver.find_element_by_id("select_1015667")
+drp=Select(certification)
+drp.select_by_index(2)
+
+pooja=driver.find_element_by_id("select_14054")
+drp=Select(pooja)
+drp.select_by_index(2)
+
+driver.execute_script("window.scrollTo(0, 400)","")
+ring=driver.find_element_by_id("options_8744047_2").click()
+
+metal= driver.find_element_by_id("select_8744049")
+drp=Select(metal)
+drp.select_by_index(2)
+
+driver.execute_script("window.scrollTo(0, 600)","")
+design=driver.find_element_by_id("options_8744053_1").click()
+
+size_system= driver.find_element_by_id("select_8744081")
+drp=Select(size_system)
+drp.select_by_index(2)
+
+size= driver.find_element_by_id("select_8744082")
+drp=Select(size)
+drp.select_by_index(6)
+
+time.sleep(5)
+#######Add product in cart######
+Addtocart=driver.find_element_by_id("addtobagcart").click()
+time.sleep(5)
+
+#####Mini cart function######
+#trytoremoveproduct=driver.find_element_by_xpath("/html/body/div[3]/div/div[2]/header/div[1]/didiv[3]/ul/li[5]/div/div/div[3]/div[1]/ul/li/div/a").click()
+driver.find_element(By.LINK_TEXT, "CHECKOUT").click()
+time.sleep(5)
+#driver.back()
+
+####sticky footer confirmation#######
+
+sticky_footer=driver.find_elements_by_class_name('payment_icons')
+s = len(sticky_footer)
+if(s>0):
+    print(colored("Sticky footer is reflecting on checkout page", "green"))
+else:
+    print(colored("Found some issue, please check the sticky footer on checkout page", "red"))
+time.sleep(5)
+
+##################Address section###################
+cols= driver.find_element_by_id("login:guest").click()
+First_name=driver.find_element_by_id("billing:firstname")
+# print("First name text column is displaying:",First_name.is_displayed())
+# print("First name text column is enabled:",First_name.is_enabled())
+
+Last_name=driver.find_element_by_id("billing:lastname")
+# print("Last name text column is displaying:", Last_name.is_displayed())
+# print("Last name text column is Enabled:",Last_name.is_enabled())
+
+email=driver.find_element_by_id("billing:email")
+# print("Email text column is displaying:", Last_name.is_displayed())
+# print("Email text column is Enabled:",Last_name.is_enabled())
+
+Phone=driver.find_element_by_id("billing:telephone")
+# print("Phone text column is displaying:", Last_name.is_displayed())
+# print("Phone text column is Enabled:",Last_name.is_enabled())\
+
+Addressline1=driver.find_element_by_id("billing:street1")
+# print("Addressline1 text column is displaying:", Last_name.is_displayed())
+# print("Addressline1 text column is Enabled:",Last_name.is_enabled())
+
+Addressline2=driver.find_element_by_id("billing:street2")
+# print("Addressline2 text column is displaying:", Last_name.is_displayed())
+# print("Addressline2 text column is Enabled:",Last_name.is_enabled())
+
+City=driver.find_element_by_id("billing:city")
+# print("City text column is displaying:", Last_name.is_displayed())
+# print("City text column is Enabled:",Last_name.is_enabled())
+
+Zipcode=driver.find_element_by_id("billing:postcode")
+# print("Zipcode text column is displaying:", Last_name.is_displayed())
+# print("Zipcode text column is Enabled:",Last_name.is_enabled())
+
+Country_code = driver.find_element_by_id("demo_telephone")
+cur_dd = Select(Country_code)
+cur= cur_dd.first_selected_option.text
+cur1 = cur.replace(" ","")
+print(colored("Country code reflecting on address section:", "green"),cur1[0:5])
+line15="Country code reflecting on address section:",cur1[0:5]
+lst_excel.append(line15)
+
+
+Country_name = driver.find_element_by_id("billing:country_id")
+country_dd = Select(Country_name)
+country= country_dd.first_selected_option.text
+country1 = country.replace(" ","")
+print(colored("Country name reflecting on address section:", "green"),country1[0:8])
+line16="Country name reflecting on address section:",country1[0:8]
+lst_excel.append(line16)
+First_name.send_keys("Test")
+Last_name.send_keys("Test")
+email.send_keys("alak@gempundit.com")
+Phone.send_keys("8377992462")
+Addressline1.send_keys("Test")
+Addressline2.send_keys("Test")
+
+State13= driver.find_element_by_id("billing:region_id")
+drp=Select(State13)
+drp.select_by_index(13)
+# print(len(drp.options))
+# all_options=drp.options
+# for option in all_options:
+#         print("List of State names",option.text)
+
+City.send_keys("Gurgaon")
+Zipcode.send_keys("122003")
+
+Clickcontinue=driver.find_element_by_id("custom_checkstate").click()
+Continuebutton=driver.find_element_by_id("custom_checkstate")
+print(colored("Continue button is displaying on checkout page:", "green") , Continuebutton.is_displayed())
+line17="Continue button is displaying on checkout page:",Continuebutton.is_displayed()
+lst_excel.append(line17)
+
+################Shipping section#####################
+
+shipping_button=driver.find_element_by_id("shipping-method-buttons-container")
+shipping_button.click()
+driver.execute_script("window.scrollTo(0, 600)","")
+time.sleep(5)
+#####Payment option at checkout page#########
+CCavenue=driver.find_element_by_id("dt_method_ccavenuepay")
+print(colored("CCAvenue payment option is default selected at the checkout page:", "green"), CCavenue.is_selected())
+line18="CCAvenue payment option is default selected at the checkout page:",CCavenue.is_selected()
+lst_excel.append(line18)
+
+COD=driver.find_element_by_id("p_method_cashondelivery")
+# print("COD option should not be selected:", COD.is_displayed())
+BT=driver.find_element_by_id("p_method_banktransfer")
+# print("BT option should not be selected:", BT.is_displayed())
+#########placed order in COD##########
+driver.execute_script("window.scrollTo(0, 600)","")
+time.sleep(4)
+COD1=driver.find_element_by_id("p_method_cashondelivery").click()
+time.sleep(15)
+
+driver.find_element_by_id("placeorderbutton").click()
+
+
+##########order confirmation page#############
+time.sleep(15)
+orderedproduct= driver.find_element_by_xpath("/html/body/div[4]/div/div[2]/div[2]/div/div[2]/div[3]/table/tbody/tr[2]/td[2]/strong[1]/a").text
+print(colored("Ordered product name:", "green"), orderedproduct)
+line19="Ordered product name:",orderedproduct
+lst_excel.append(line19)
+
+Productweight= driver.find_element_by_xpath("/html/body/div[4]/div/div[2]/div[2]/div/div[2]/div[3]/table/tbody/tr[2]/td[2]/span").text
+print(colored("Product weight:", "green"), Productweight)
+line20="Product weight::",Productweight
+lst_excel.append(line20)
+
+orderconfirmation=driver.find_element_by_xpath("/html/body/div[4]/div/div[2]/div[2]/div/div[2]/p[1]").text
+print(colored("order ID:","green"), orderconfirmation)
+line21 = "order ID:", orderconfirmation
+lst_excel.append(line21)
+
+print(colored("Order confirmation page:", "green"),driver.title)
+line22="Order confirmation page:",driver.title
+lst_excel.append(line22)
+
+subTotalamount= driver.find_element_by_xpath("/html/body/div[4]/div/div[2]/div[2]/div/div[2]/div[3]/table/tfoot/tr[1]/td/span").text
+print(colored("Subtotalamount:", "green"),subTotalamount)
+line23 = "Subtotalamount::", subTotalamount
+lst_excel.append(line23)
+
+Shippingamount= driver.find_element_by_xpath("/html/body/div[4]/div/div[2]/div[2]/div/div[2]/div[3]/table/tfoot/tr[2]/td/span").text
+print(colored("Shipping amount:","green"), Shippingamount)
+line24 = "Shipping amount:", Shippingamount
+lst_excel.append(line24)
+
+Grandtotal= driver.find_element_by_xpath("/html/body/div[4]/div/div[2]/div[2]/div/div[2]/div[3]/table/tfoot/tr[4]/td/span").text
+print(colored("Grand Total amount:", "green"),Grandtotal)
+line25 = "Grand Total amount::", Grandtotal
+lst_excel.append(line25)
+
+################################################################
+
+
+############## Switch to new window ####################
+
+driver.implicitly_wait(5)
+
+driver.execute_script("window.open('https://www.gempundit.com', 'new window')")
+window_after = driver.window_handles[1]
+
+driver.switch_to.window(window_after)
+time.sleep(10)
+
+# #####Check forgot password page######
+#
+# Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+# time.sleep(5)
+# Clicklogin=driver.find_element_by_link_text("Log In").click()
+# time.sleep(5)
+#
+# forgotpswrd= driver.find_element_by_class_name("f-left").click()
+# time.sleep(5)
+# FP_email= driver.find_element_by_id("email_address").send_keys("alak@gempundit.com")
+# time.sleep(2)
+# Submit_button= driver.find_element_by_class_name("buttons-set").click()
+# time.sleep(5)
+# message=driver.find_element_by_class_name("messages").text
+# print(colored("After submit the email address on forgot password, this message is reflecting:", "green"), message)
+# line26=" After submit the email address on forgot password, this message is reflecting:", message
+# lst_excel.append(line26)
+#
+# time.sleep(10)
+#
+# #####Email confirmiation####################
+#
+# SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+#
+# def getEmails_pwd():
+#     creds = None
+#     if os.path.exists('token.pickle'):
+#         with open('token.pickle', 'rb') as token:
+#             creds = pickle.load(token)
+#
+#     if not creds or not creds.valid:
+#         if creds and creds.expired and creds.refresh_token:
+#             creds.refresh(Request())
+#         else:
+#             flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+#             creds = flow.run_local_server(port=0)
+#         with open('token.pickle', 'wb') as token:
+#             pickle.dump(creds, token)
+#
+#     #connect to gmail API
+#     service = build('gmail', 'v1', credentials=creds)
+#
+#     # request a list of all the messages
+#     result = service.users().messages().list(maxResults=1,userId='me',labelIds = ['INBOX']).execute()
+#
+#     # We can also pass maxResults to get any number of emails. Like this
+#     # result = service.users().messages().list(maxResults=200, userId='me').execute()
+#     messages = result.get('messages')
+#     #print(messages)
+#     id1 = messages[0]['id']
+#     #print(id1)
+#
+#     txt = service.users().messages().get(userId='me', id=id1).execute()
+#     #print(txt)
+#
+#     payload = txt['payload']
+#     headers = payload['headers']
+#     #print(headers)
+#     #parts = payload.get('parts')
+#     #print(parts)
+#     mssg_parts = payload['body']['data']
+#     data = mssg_parts.replace("-","+").replace("_","/")
+#     decoded_data = base64.b64decode(data)
+#     soup = BeautifulSoup(decoded_data , "lxml")
+#     body = soup.body()
+#     #print(body)
+#     #price = soup.select_one('td:contains("price")')
+#     #price = soup.select_one("span[class*=price]").text
+#     #print(price)
+#     all_links=soup.findAll("a")
+#
+#     for d in headers:
+#         if d['name'] == 'Subject':
+#             subject = d['value']
+#             #print("Subject:",subject)
+#         if d['name'] == 'From':
+#             sender = d['value']
+#             #print("Sender:",sender)
+#
+#     for links in all_links:
+#         #print(links.get("href"))
+#         if links.get("href").startswith("https://www.gempundit.com/customer"):
+#             reset_link=links.get("href")
+#             #print(reset_link)
+#
+#     if subject.startswith("Password Reset Confirmation for"):
+#         print(colored("Reset Link:","green"),reset_link)
+#         driver.implicitly_wait(5)
+#
+#         driver.execute_script("window.open('');")
+#         time.sleep(5)
+#         driver.switch_to.window(driver.window_handles[1])
+#         driver.get(reset_link)
+#         time.sleep(5)
+#
+# getEmails_pwd()
+#
+# #####Put new password######
+# time.sleep(3)
+# New_Pswrd= driver.find_element_by_id("password").send_keys("Qwerty@123")
+# time.sleep(3)
+# Confirm_NP= driver.find_element_by_id("confirmation").send_keys("Qwerty@123")
+# time.sleep(3)
+# click_button= driver.find_element_by_xpath("//*[@id='form-validate']/div[2]/button/span/span").click()
+# time.sleep(3)
+# New_password= driver.find_element_by_class_name("success-msg").text
+# print(colored("After changing new password this message is reflecting:","green"), New_password)
+# line27 = "After changing new password this message is reflecting:", New_password
+# lst_excel.append(line27)
+# time.sleep(3)
+
+##############login Account in new window ####################
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+time.sleep(5)
+
+Clicklogin=driver.find_element_by_link_text("Log In").click()
+time.sleep(5)
+
+user_name = driver.find_element_by_id("email")
+# print("Username text colums is reflecting", user_name.is_displayed())
+# print("Usernametext columns is enabled", user_name.is_enabled())
+
+user_password = driver.find_element_by_id("pass")
+# print(colored("Password text columns is reflecting","green"), user_password.is_displayed())
+# print((colored("Password text columns is enabled","green"), user_password.is_enabled())
+
+user_name.send_keys("alak@gempundit.com")
+user_password.send_keys("Qwerty@123")
+click_login_button= driver.find_element_by_id("send2").click()
+print(colored("Account is logged in successfully:", "green"), driver.title)
+line28 = "Account is logged in successfully:", driver.title
+lst_excel.append(line28)
+
+Click_Gempundit_logo= driver.find_element_by_class_name("logo").click()
+
+############Scroll website home page#####################
+time.sleep(5)
+action = ActionChains(driver);
+
+parent_level_menu = driver.find_element (By.LINK_TEXT, "GEMSTONES")
+action.move_to_element(parent_level_menu).perform()
+
+child_level_menu = driver.find_element (By.LINK_TEXT, "Amethyst")
+child_level_menu.click();
+###################Wishlist & Play icon###########
+time.sleep(3)
+driver.execute_script("window.scrollTo(0, 1000)","")
+
+###################open product####################################
+Productdetail=driver.find_element_by_link_text("AMETHYST (LUXURY) - EMERALD CUT").click()
+
+weight=driver.find_element_by_id("select_76886")
+drp= Select(weight)
+drp.select_by_index(2)
+# print(len(drp.options))
+# all_options=drp.options
+# for option in all_options:
+#     print(option.text)
+
+certification= driver.find_element_by_id("select_1015670")
+drp=Select(certification)
+drp.select_by_index(2)
+# print(len(drp.options))
+# all_options=drp.options
+# for option in all_options:
+#     print(option.text)
+
+pooja=driver.find_element_by_id("select_15536")
+drp=Select(pooja)
+drp.select_by_index(2)
+# print(len(drp.options))
+# all_options=drp.options
+# for option in all_options:
+#     print(option.text)
+driver.execute_script("window.scrollTo(0, 00)","")
+ring=driver.find_element_by_id("options_8744084_2").click()
+
+
+metal= driver.find_element_by_id("select_8744086")
+drp=Select(metal)
+drp.select_by_index(2)
+
+driver.execute_script("window.scrollTo(0, 600)","")
+design=driver.find_element_by_id("options_8744090_1").click()
+
+size_system= driver.find_element_by_id("select_8744118")
+drp=Select(size_system)
+drp.select_by_index(2)
+
+size= driver.find_element_by_id("select_8744119")
+drp=Select(size)
+drp.select_by_index(6)
+
+time.sleep(5)
+#######Add product in cart######
+Addtocart=driver.find_element_by_id("addtobagcart").click()
+time.sleep(5)
+
+#####Mini cart function######
+driver.find_element(By.LINK_TEXT, "CHECKOUT").click()
+time.sleep(5)
+
+click_on_continue= driver.find_element_by_id("custom_checkstate").click()
+time.sleep(3)
+
+shipping_button=driver.find_element_by_id("shipping-method-buttons-container")
+shipping_button.click()
+driver.execute_script("window.scrollTo(0, 600)","")
+time.sleep(30)
+driver.find_element_by_id("placeorderbutton").click()
+time.sleep(40)
+print(colored("After click on place order for cc avenue,this page is open:", "green"),driver.title)
+line29 = "After click on place order for cc avenue,this page is open::", driver.title
+lst_excel.append(line29)
+
+output_df=pd.DataFrame(lst_excel)
+output_df.to_excel("RegularTesting.xlsx",index=False,sheet_name=str(today),header=None)
+

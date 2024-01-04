@@ -1,0 +1,104 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from time import sleep
+import time
+from termcolor import colored
+import pandas as pd
+from datetime import date
+from openpyxl import load_workbook
+from selenium.webdriver.chrome.options import Options
+##########login##################
+driver = webdriver.Chrome(executable_path=r"C:\Users\Alak\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+driver.maximize_window()
+# driver.get('chrome://settings/')
+# driver.execute_script('chrome.settingsPrivate.setDefaultZoom(0.3);')
+# time.sleep(4)
+driver.get("https://accounts.lambdatest.com/login")
+driver.implicitly_wait(10)
+
+User_name= driver.find_element_by_class_name("form-control ")
+User_name.send_keys("catalog@gempundit.com")
+time.sleep(1)
+Pswrd= driver.find_element_by_xpath("//*[@id='userpassword']")
+Pswrd.send_keys("gempundit12345#$")
+time.sleep(1)
+Click_Login= driver.find_element_by_class_name("submit-btn").click()
+
+############ Go to test log section#########################
+action = ActionChains(driver);
+
+parent_level_menu = driver.find_element (By.XPATH , "//*[@id='header']/div[3]/div[6]/a")
+action.move_to_element(parent_level_menu).perform()
+
+child_level_menu = driver.find_element (By.LINK_TEXT, "Test Logs")
+child_level_menu.click();
+
+time.sleep(5)
+###########change date#####################
+slt_date= driver.find_element_by_class_name("testlog-calender").click()
+time.sleep(2)
+clr_date= driver.find_element_by_xpath("/html/body/app-root/app-console/app-header/section/app-new-testlog/div[1]/div/div[4]/input").clear()
+time.sleep(2)
+Input_dates= driver.find_element_by_xpath("/html/body/app-root/app-console/app-header/section/app-new-testlog/div[1]/div/div[4]/input")
+Input_dates.send_keys("May 1, 2021 - May 31, 2021")
+Click_apply= driver.find_element_by_xpath("/html/body/app-root/app-console/app-header/section/app-new-testlog/div[1]/div/div[4]/ngx-daterangepicker-material/div/div[4]/div/button[3]").click()
+total_logs= driver.find_element_by_class_name("page-num").text
+print(colored("Total Logs:", "red"),total_logs)
+
+###########page change #########
+
+
+Page_no=driver.find_element_by_xpath("/html/body/app-root/app-console/app-header/section/app-new-testlog/div[2]/div[1]/div/div[3]/div/div[2]/div/select")
+drp= Select(Page_no)
+drp.select_by_index(0)
+
+
+##### print logs#################
+#driver.execute_script("document.body.style.transform = 'scale(0.2)'")
+time.sleep(3)
+Logs=driver.find_element_by_xpath("//*[@id='mCSB_2']").text
+print(colored("One line logs :", "red"), Logs)
+
+numRecords=driver.find_elements_by_class_name("bug-list-lable-bug")
+print("No. of records",len(numRecords))
+
+for i in range(2,14):
+    CAL = driver.find_element_by_xpath("//*[@id='mCSB_1_container']/div["+str(i)+"]/div").click()
+    time.sleep(2)
+    Log = driver.find_element_by_xpath("//*[@id='mCSB_2']").text
+    print(colored("One line logs :" + str(i), "red"), Log)
+
+CAL2= driver.find_element_by_xpath("//*[@id='mCSB_1_container']/div[2]/div").click()
+# Logs2=driver.find_element_by_xpath("//*[@id='mCSB_2']").text
+# print(colored("One line logs :", "red"), Logs2)
+#
+# CAL3= driver.find_element_by_xpath("//*[@id='mCSB_1_container']/div[3]/div").click()
+# Logs3=driver.find_element_by_xpath("//*[@id='mCSB_2']").text
+# print(colored("One line logs :", "red"), Logs3)
+#
+# CAL10= driver.find_element_by_xpath("//*[@id='mCSB_1_container']/div[10]/div").click()
+# Logs10= driver.find_element_by_xpath("//*[@id='mCSB_2']").text
+# print(colored("One line logs :", "red"), Logs10)
+#
+# CAL10= driver.find_element_by_xpath("//*[@id='mCSB_1_container']/div[10]/div").click()
+# time.sleep(5)
+#
+# CAL11= driver.find_element_by_xpath("//*[@id='mCSB_1_container']/div[11]/div").click()
+# Logs11= driver.find_element_by_xpath("//*[@id='mCSB_2']").text
+# print(colored("One line logs :", "red"), Logs11)
+#
+# CAL50= driver.find_element_by_xpath("//*[@id='mCSB_1_container']/div[50]/div").click()
+# Logs50= driver.find_element_by_xpath("//*[@id='mCSB_2']").text
+# print(colored("One line logs :", "red"), Logs50)
+
+
+
+
+
+
+
+

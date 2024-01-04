@@ -1,0 +1,16 @@
+from selenium import webdriver
+from selenium.webdriver import ActionChains
+from selenium.webdriver.common.by import By
+
+driver = webdriver.Chrome(executable_path=r"C:\Users\Alak\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+driver.get("https://www.gempundit.com")
+driver.maximize_window()
+
+actions=ActionChains(driver)
+
+parent_level_menu = driver.find_element (By.LINK_TEXT, "GEMSTONES")
+actions.move_to_element(parent_level_menu).perform()
+
+child_level_menu = driver.find_element (By.LINK_TEXT, "Amethyst")
+#child_level_menu.click();
+actions.move_to_element(child_level_menu).click().perform()

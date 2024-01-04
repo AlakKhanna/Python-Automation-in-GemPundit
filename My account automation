@@ -1,0 +1,223 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from time import sleep
+import time
+from termcolor import colored
+import pandas as pd
+from datetime import date
+from openpyxl import load_workbook
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+import pickle
+import os.path
+import base64
+import email
+from bs4 import BeautifulSoup
+
+driver = webdriver.Chrome(executable_path=r"C:\Users\Alak\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+driver.maximize_window()
+driver.get("https://www.gempundit.com/?85794hgfyguyguy")
+driver.implicitly_wait(10)
+
+
+window_before = driver.window_handles[0]
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+time.sleep(3)
+
+
+##############create an account###############
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+Click_createanaccount=driver.find_element_by_link_text("Create an Account").click()
+parent = driver.current_window_handle
+time.sleep(4)
+facebook_icon= driver.find_element_by_class_name("facebookbtn_social").click()
+window_after = driver.window_handles[1]
+driver.switch_to.window(window_after)
+time.sleep(3)
+print(colored("Facebook API option is working on create an account page :", "green"),driver.title )
+driver.close()
+driver.switch_to.window(parent)
+time.sleep(2)
+gmail_icon= driver.find_element_by_class_name("googlebutton_social").click()
+window_after = driver.window_handles[1]
+driver.switch_to.window(window_after)
+time.sleep(3)
+print(colored("Google+ API option is working on create an account page: ", "green"),driver.title )
+driver.close()
+driver.switch_to.window(parent);
+time.sleep(6)
+
+#### fill create an account form##############
+
+First_name= driver.find_element_by_id("firstname").send_keys("test")
+Last_name=driver.find_element_by_id("lastname").send_keys("test")
+Phone= driver.find_element_by_id("mobile_no").send_keys("9876543210")
+email=driver.find_element_by_id("email_address").send_keys("abc@abcd.com")
+time.sleep(3)
+driver.execute_script("window.scrollTo(0, 200)","")
+password= driver.find_element_by_id("password").send_keys("Qwerty@123")
+Confirm_password=driver.find_element_by_id("confirmation").send_keys("Qwerty@123")
+driver.implicitly_wait(10)
+click_register= driver.find_element_by_class_name("web_engage_customer_reg").click()
+time.sleep(6)
+print(colored("Account creation successfully completed :", "green"),driver.title )
+time.sleep(3)
+
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+Logout= driver.find_element_by_link_text("Logout").click()
+time.sleep(2)
+# logoutpage= driver.find_element_by_class_name("page-title").text
+
+############facebook#############
+parent = driver.current_window_handle
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+facebook_icon= driver.find_element_by_class_name("facebookbtn").click()
+window_after = driver.window_handles[1]
+driver.switch_to.window(window_after)
+time.sleep(3)
+print(colored("Facebook API option is working for accounts :", "green"),driver.title )
+driver.close()
+
+#############gmail########################
+driver.switch_to.window(parent)
+time.sleep(2)
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+time.sleep(2)
+gmail_icon= driver.find_element_by_class_name("googlebutton").click()
+window_after = driver.window_handles[1]
+driver.switch_to.window(window_after)
+time.sleep(3)
+print(colored("Google+ API option is working for accounts: ", "green"),driver.title )
+driver.close()
+
+driver.switch_to.window(parent);
+time.sleep(5)
+
+####### forgot password######
+
+Clicklogin=driver.find_element_by_link_text("Log In").click()
+time.sleep(5)
+
+# forgotpswrd= driver.find_element_by_class_name("f-left").click()
+# time.sleep(5)
+# FP_email= driver.find_element_by_id("email_address").send_keys("alak@gempundit.com")
+# time.sleep(2)
+# Submit_button= driver.find_element_by_class_name("buttons-set").click()
+# time.sleep(5)
+# message=driver.find_element_by_class_name("messages").text
+# print(colored("After submit the email address on forgot password, this message is reflecting:", "green"), message)
+#
+# time.sleep(10)
+#
+# #####Email confirmiation####################
+#
+# SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+#
+# def getEmails_pwd():
+#     creds = None
+#     if os.path.exists('token.pickle'):
+#         with open('token.pickle', 'rb') as token:
+#             creds = pickle.load(token)
+#
+#     if not creds or not creds.valid:
+#         if creds and creds.expired and creds.refresh_token:
+#             creds.refresh(Request())
+#         else:
+#             flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+#             creds = flow.run_local_server(port=0)
+#         with open('token.pickle', 'wb') as token:
+#             pickle.dump(creds, token)
+#
+#     #connect to gmail API
+#     service = build('gmail', 'v1', credentials=creds)
+#
+#     # request a list of all the messages
+#     result = service.users().messages().list(maxResults=1,userId='me',labelIds = ['INBOX']).execute()
+#
+#     # We can also pass maxResults to get any number of emails. Like this
+#     # result = service.users().messages().list(maxResults=200, userId='me').execute()
+#     messages = result.get('messages')
+#     #print(messages)
+#     id1 = messages[0]['id']
+#     #print(id1)
+#
+#     txt = service.users().messages().get(userId='me', id=id1).execute()
+#     #print(txt)
+#
+#     payload = txt['payload']
+#     headers = payload['headers']
+#     #print(headers)
+#     #parts = payload.get('parts')
+#     #print(parts)
+#     mssg_parts = payload['body']['data']
+#     data = mssg_parts.replace("-","+").replace("_","/")
+#     decoded_data = base64.b64decode(data)
+#     soup = BeautifulSoup(decoded_data , "lxml")
+#     body = soup.body()
+#     #print(body)
+#     #price = soup.select_one('td:contains("price")')
+#     #price = soup.select_one("span[class*=price]").text
+#     #print(price)
+#     all_links=soup.findAll("a")
+#
+#     for d in headers:
+#         if d['name'] == 'Subject':
+#             subject = d['value']
+#             #print("Subject:",subject)
+#         if d['name'] == 'From':
+#             sender = d['value']
+#             #print("Sender:",sender)
+#
+#     for links in all_links:
+#         #print(links.get("href"))
+#         if links.get("href").startswith("https://www.gempundit.com/customer"):
+#             reset_link=links.get("href")
+#             #print(reset_link)
+#
+#     if subject.startswith("Password Reset Confirmation for"):
+#         print(colored("Reset Link:","green"),reset_link)
+#         driver.implicitly_wait(5)
+#
+#         driver.execute_script("window.open('');")
+#         time.sleep(5)
+#         driver.switch_to.window(driver.window_handles[1])
+#         driver.get(reset_link)
+#         time.sleep(5)
+#
+# getEmails_pwd()
+#
+# #####Put new password######
+# time.sleep(3)
+# New_Pswrd= driver.find_element_by_id("password").send_keys("Qwerty@123")
+# time.sleep(3)
+# Confirm_NP= driver.find_element_by_id("confirmation").send_keys("Qwerty@123")
+# time.sleep(3)
+# click_button= driver.find_element_by_xpath("//*[@id='form-validate']/div[2]/button/span/span").click()
+# time.sleep(3)
+# New_password= driver.find_element_by_class_name("success-msg").text
+# print(colored("After changing new password this message is reflecting:","green"), New_password)
+# time.sleep(3)
+
+##############login Account in new window ####################
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+time.sleep(5)
+
+Clicklogin=driver.find_element_by_link_text("Log In").click()
+time.sleep(5)
+
+user_name = driver.find_element_by_id("email")
+# print("Username text colums is reflecting", user_name.is_displayed())
+# print("Usernametext columns is enabled", user_name.is_enabled())
+
+user_password = driver.find_element_by_id("pass")
+# print(colored("Password text columns is reflecting","green"), user_password.is_displayed())
+# print((colored("Password text columns is enabled","green"), user_password.is_enabled())
+
+user_name.send_keys("alak@gempundit.com")
+user_password.send_keys("Qwerty@123")
+click_login_button= driver.find_element_by_id("send2").click()
+

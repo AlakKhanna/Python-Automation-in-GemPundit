@@ -1,0 +1,116 @@
+from selenium import webdriver
+from selenium.webdriver.common. by import By
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.remote.webelement import WebElement
+from time import sleep
+import time
+driver = webdriver.Chrome(executable_path=r"C:\Users\Alak\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+driver.get("https://gempundit.com/")
+print(driver.title)
+driver.implicitly_wait(10)
+print(driver.current_url)
+print(driver.page_source)
+driver.find_element_by_xpath("/html/body/div[1]/div/div[2]/header/div[1]/div/div[3]/ul/li[3]/div[1]/a/span[2]").click()
+time.sleep(5)
+driver.find_element_by_xpath("/html/body/div[1]/div/div[2]/header/div[1]/div/div[3]/ul/li[3]/div[2]/div/div[2]/a").click()
+time.sleep(5)
+user_name = driver.find_element_by_xpath("/html/body/div[3]/div/div[2]/div[2]/div/div/div[3]/form/div/div[1]/div[1]/ul/li[1]/div/input")
+print(user_name.is_displayed())
+print(user_name.is_enabled())
+user_password = driver.find_element_by_xpath("/html/body/div[3]/div/div[2]/div[2]/div/div/div[3]/form/div/div[1]/div[1]/ul/li[2]/div/input")
+print(user_password.is_displayed())
+print(user_password.is_enabled())
+user_name.send_keys("alak@gempundit.com")
+user_password.send_keys("Qwerty@123")
+driver.find_element_by_xpath("/html/body/div[3]/div/div[2]/div[2]/div/div/div[3]/form/div/div[1]/div[2]/button/span/span").click()
+driver.find_element_by_xpath("/html/body/div[1]/div/div[2]/header/div[1]/div/div[2]/a/img").click()
+time.sleep(10)
+action = ActionChains(driver);
+
+parent_level_menu = driver.find_element (By.LINK_TEXT, "GEMSTONES")
+action.move_to_element(parent_level_menu).perform()
+
+child_level_menu = driver.find_element (By.LINK_TEXT, "Amethyst")
+child_level_menu.click();
+
+sleep(10)
+driver.execute_script("window.scrollTo(0, 1000)","")
+driver.find_element(By.LINK_TEXT, "GREEN AMETHYST (PRASIOLITE) - ECONOMY").click()
+
+weight=driver.find_element_by_id("select_4189792")
+drp= Select(weight)
+drp.select_by_index(2)
+#drp.select_by_value("11185022")
+#drp.select_by_visible_text("3.25 ratti (2.93 carat) Rs.2,352")
+print(len(drp.options))
+all_options=drp.options
+for option in all_options:
+        print(option.text)
+
+certification= driver.find_element_by_id("select_1529331")
+drp=Select(certification)
+drp.select_by_visible_text("Lab Certificate - GTL Jaipur ( Extra 4 Days) +Rs.1,500")
+print(len(drp.options))
+all_options=drp.options
+for option in all_options:
+  print(option.text)
+
+pooja=driver.find_element_by_id("select_1529332")
+drp=Select(pooja)
+drp.select_by_index(2)
+print(len(drp.options))
+all_options=drp.options
+for option in all_options:
+        print(option.text)
+
+ring=driver.find_element_by_id("options_3362410_2").click()
+print(ring)
+
+metal= driver.find_element_by_id("select_3362412")
+drp=Select(metal)
+drp.select_by_index(2)
+print(len(drp.options))
+all_options=drp.options
+for option in all_options:
+        print(option.text)
+
+design=driver.find_element_by_id("options_3362416_3").click()
+print(design)
+
+size_system= driver.find_element_by_id("select_3362433")
+drp=Select(size_system)
+drp.select_by_index(2)
+print(len(drp.options))
+all_options=drp.options
+for option in all_options:
+        print(option.text)
+
+size= driver.find_element_by_id("select_3362434")
+drp=Select(size)
+drp.select_by_index(6)
+print(len(drp.options))
+all_options=drp.options
+for option in all_options:
+        print(option.text)
+
+time.sleep(5)
+
+driver.find_element_by_xpath("/html/body/div[2]/div/div[2]/div[2]/div/div[3]/div[5]/div/div[1]/form/div[3]/div[5]/div[1]/div[2]/input").click()
+driver.find_element_by_xpath("/html/body/div[2]/div/div[2]/header/div[1]/div/div[3]/ul/li[5]/div/a/span[2]/i").click()
+time.sleep(5)
+#driver.find_element_by_xpath("/html/body/div[2]/div/div[2]/header/div[1]/div/div[3]/ul/li[5]/div/div/div[3]/div[1]/ul/li/div/a").click()
+time.sleep(5)
+#driver.switch_to_alert().accept()
+#driver.switch_to_alert().dismiss()
+driver.find_element(By.LINK_TEXT, "CHECKOUT").click()
+time.sleep(5)
+driver.find_element_by_xpath("/html/body/div[1]/div/div[2]/div[2]/div/div[1]/ol/li[1]/div[2]/form/div/div/button/span/span").click()
+time.sleep(5)
+driver.find_element_by_xpath("/html/body/div[1]/div/div[2]/div[2]/div/div[1]/ol/li[3]/div[2]/form/div[3]/button/span/span").click()
+time.sleep(5)
+driver.find_element_by_xpath("/html/body/div[1]/div/div[2]/div[2]/div/div[1]/ol/li[4]/div[2]/form/div/dl/dt[2]/input").click()
+time.sleep(5)
+driver.find_element_by_xpath("/html/body/div[1]/div/div[2]/div[2]/div/div[1]/ol/li[4]/div[2]/form/div/dl/div[5]/button/span/span").click()
+time.sleep(5)
+#driver.close()

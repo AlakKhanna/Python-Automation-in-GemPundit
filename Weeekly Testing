@@ -1,0 +1,517 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from time import sleep
+import time
+from termcolor import colored
+import pandas as pd
+from datetime import date
+from openpyxl import load_workbook
+
+####open website#############
+driver = webdriver.Chrome(executable_path=r"C:\Users\Alak\AppData\Local\Programs\Python\Python39\chromedriver.exe")
+driver.maximize_window()
+driver.get("https://www.gempundit.com/")
+driver.implicitly_wait(10)
+
+lst_excel=[]
+window_before = driver.window_handles[0]
+window_before_title = driver.title
+
+print(colored("Open the 'www.Gempundit.com' website: ","green"), driver.current_url)
+
+today = date.today()
+
+line1="Open the 'www.Gempundit.com", driver.current_url
+lst_excel.append(line1)
+
+######### Website load time #######
+navigation_start = driver.execute_script("return window.performance.timing.navigationStart")
+dom_complete = driver.execute_script(" return window.performance.timing.domComplete")
+total_time = dom_complete - navigation_start
+
+print(colored("check the website is load time?:","green"),total_time,"ms")
+line2="check the website is load time?", str(total_time)+" ms"
+lst_excel.append(line2)
+
+time.sleep(5)
+# Customer Care number and currency #
+currency = driver.find_element_by_id("select-currency")
+phone = driver.find_element_by_class_name("phone-box")
+cur_dd = Select(currency)
+cur= cur_dd.first_selected_option.text
+cur1 = cur.replace(" ","")
+ph= phone.text
+ph1 = ph.replace(" ","")
+
+print(colored("Check correct currency is reflecting? (Indian currency) :","green"),cur1[0:3],"\n",colored("Check if the Correct customer care number is reflecting?(Indian number:)","green"),ph1)
+
+line3="2-Check correct currency is reflecting? (Indian currency)", cur1[0:3]
+lst_excel.append(line3)
+line4="2-Check if the Correct customer care number is reflecting?(Indian number)", ph1
+lst_excel.append(line4)
+#####Total website Baneer##########
+
+Banner1= driver.find_elements_by_xpath("//*[@id='top']/body/div[3]/div/div[2]/div[3]/div/ul/li")
+len(Banner1)
+print(colored("Total Image Banners on website homepage:","green"),len(Banner1))
+line5="2-Check if the Correct customer care number is reflecting?(Indian number)", ph1
+lst_excel.append(line5)
+
+#####Total Homepage video Baneer##########
+Video_Banner1= driver.find_elements_by_class_name("trial-video")
+len(Video_Banner1)
+print(colored("Total Video Banners on website homepage:","green"),len(Video_Banner1))
+line5="2-Check if the Correct customer care number is reflecting?(Indian number)", ph1
+lst_excel.append(line5)
+
+# Search iCon - dd window with product name and category #
+driver.implicitly_wait(5)
+Open_search_icon= driver.find_element_by_class_name("fa-search").click()
+Type_In_searchbox= driver.find_element_by_id("search").send_keys("Emerald")
+time.sleep(4)
+listelements=driver.find_elements(By.XPATH, "//*[@id='search_autocomplete']/ul/li")
+list_ele=[]
+for a in range(len(listelements)):
+    k=listelements[a].text
+    if k!="":
+        list_ele.append(k)
+print(colored("Check after typing name in the search section, the dropdown window should reflect with the product name & category:","green"),list_ele)
+line6="after typing name in the search section, the dropdown window should reflect with the product name & category", list_ele
+lst_excel.append(line6)
+
+####Click my account ########
+
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+Account_dropdown= driver.find_element_by_class_name("myaccountblock-box").is_displayed()
+print(colored("Check if the dropdown window is showing under my account section: ","green"),Account_dropdown)
+line7="Check if the dropdown window is showing under my account section ", Account_dropdown
+lst_excel.append(line7)
+
+parent = driver.current_window_handle
+time.sleep(2)
+click_create_account = driver.find_element_by_link_text("Create an Account").click()
+time.sleep(2)
+print(colored("Create an account page is opening:","green"), driver.title)
+line8="Create an account page is opening:", click_create_account
+lst_excel.append(line8)
+
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+time.sleep(2)
+click_login= driver.find_element_by_link_text("Log In").click()
+time.sleep(2)
+print(colored("Log In page is opening:", "green"), driver.title)
+line9="Log In page is opening:", click_login
+lst_excel.append(line9)
+
+user_name = driver.find_element_by_id("email")
+user_password = driver.find_element_by_id("pass")
+user_name.send_keys("alak@gempundit.com")
+user_password.send_keys("Qwerty@123")
+click_login_button= driver.find_element_by_id("send2").click()
+time.sleep(10)
+account_page_title=driver.title
+if account_page_title=="My Account | GemPundit.com":
+    print(colored("Tried to log-in from the account section and logged in successfully:","green"), account_page_title)
+    line10 = "Try to log-in from the account section and check that the user should not face any issue:","Login Successful"
+    lst_excel.append(line10)
+
+else:
+    print(colored("Login Unsuccessful","red"))
+    line11 = "Login Status:","Login Unsuccessful"
+    lst_excel.append(line11)
+
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+Logout= driver.find_element_by_link_text("Logout").click()
+time.sleep(2)
+logoutpage= driver.find_element_by_class_name("page-title").text
+print(colored("Tried to log-out from the account section and clogged out successfully","green"), logoutpage)
+line12="Try to log-out from the account section and check that the user should not face any issue", logoutpage
+lst_excel.append(line12)
+time.sleep(10)
+
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+facebook_icon= driver.find_element_by_class_name("facebookbtn").click()
+window_after = driver.window_handles[1]
+driver.switch_to.window(window_after)
+time.sleep(3)
+print(colored("Facebook API option is working for accounts :", "green"),driver.title )
+line13="Facebook API option is working for accounts:", driver.title
+lst_excel.append(line13)
+
+driver.close()
+driver.switch_to.window(parent);
+time.sleep(2)
+
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+time.sleep(2)
+gmail_icon= driver.find_element_by_class_name("googlebutton").click()
+window_after = driver.window_handles[1]
+driver.switch_to.window(window_after)
+time.sleep(3)
+print(colored("Google+ API option is working for accounts: ", "green"),driver.title )
+line14="Google+ API option is working for accounts", driver.title
+lst_excel.append(line14)
+
+driver.close()
+driver.switch_to.window(parent);
+time.sleep(2)
+
+Account_icon_click=driver.find_element_by_class_name("loomaccount").click()
+
+###########clciked on all 4 headersbelow logo ######################
+gemstones= driver.find_element_by_link_text("GEMSTONES").click()
+time.sleep(3)
+gemstones= driver.title
+
+CALIBRATED_GEMSTONES= driver.find_element_by_link_text("CALIBRATED GEMSTONES").click()
+time.sleep(3)
+CALIBRATED_GEMSTONES=driver.title
+
+GEM_RECOMMENDATION= driver.find_element_by_link_text("GEM RECOMMENDATION").click()
+time.sleep(3)
+GEM_RECOMMENDATION= driver.title
+
+JEWELLERY= driver.find_element_by_link_text("JEWELLERY").click()
+time.sleep(3)
+JEWELLERY= driver.title
+
+CUSTOM_JEWELLERY= driver.find_element_by_link_text("CUSTOM JEWELLERY").click()
+time.sleep(3)
+CUSTOM_JEWELLERY= driver.title
+
+NEW_ARRIVALS= driver.find_element_by_link_text("NEW ARRIVALS").click()
+time.sleep(3)
+NEW_ARRIVALS= driver.title
+
+if gemstones=="Gemstones List: Gemstone Names by Color and Type | GemPundit.com" and CALIBRATED_GEMSTONES=="Calibrated Gemstone Names by Color and Type | GemPundit.com" and GEM_RECOMMENDATION=="Gemstone Recommendation by Date of Birth, Gemstone Astrology, Which Gemstone Should I Wear | GemPundit.com" and JEWELLERY=="Buy Gemstone Jewellery Online - Widest Gemstone Collection for Sale @ Best Prices | GemPundit.com" and CUSTOM_JEWELLERY== "Customize Your Jewelry With the Design of Your Choice | GemPundit.com":
+    print(colored("All 6 headers of the website are clickable and after click landing on correct page","green"))
+    line15 = "All 5 headers of the website are clickable and after click landing on correct page", gemstones, ",", CALIBRATED_GEMSTONES, ",",CUSTOM_JEWELLERY, ",", GEM_RECOMMENDATION, ",", JEWELLERY
+    lst_excel.append(line15)
+else:
+    print(colored("Some of the headers on website are not clickable,please check all the headers manually","red"))
+    line16 = "Some of the headers on website are not clickable,please check all the headers manually", gemstones, ",", CALIBRATED_GEMSTONES, ",",CUSTOM_JEWELLERY, ",", GEM_RECOMMENDATION, ",", JEWELLERY
+    lst_excel.append(line16)
+
+#################Change currency###########
+
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.LINK_TEXT, "GEMSTONES")
+action.move_to_element(parent_level_menu).perform()
+child_level_menu = driver.find_element (By.LINK_TEXT, "Emerald (Panna)")
+child_level_menu.click()
+time.sleep(3)
+Currency=driver.find_element_by_id("select-currency")
+drp= Select(Currency)
+drp.select_by_index(60)
+time.sleep(3)
+
+currency = driver.find_element_by_id("select-currency")
+cur_dd = Select(currency)
+cur= cur_dd.first_selected_option.text
+cur1 = cur.replace(" ","")
+print(colored("Currency is changed from INR to USD :","green"),cur1[0:3])
+
+########## Print SKU IDS for 2 pages ###########################
+Page_1 = driver.find_elements_by_class_name("sku_container")
+page_1_ops=[]
+for span in range(len(Page_1)):
+    span1 = Page_1[span].text
+    page_1_ops.append(span1)
+print(colored("Page 1 product's SKU IDs for","green"),len(Page_1),colored("products:","green"),page_1_ops)
+line18 = "Page 1 product's SKU IDs for", page_1_ops
+lst_excel.append(line18)
+time.sleep(3)
+driver.execute_script("window.scrollTo(0, 2000)","")
+Move_page2= driver.find_element_by_link_text("2").click()
+time.sleep(7)
+time.sleep(3)
+Page_2 = driver.find_elements_by_class_name("sku_container")
+page_2_ops=[]
+for span2 in range(len(Page_2)):
+    span3 = Page_2[span2].text
+    page_2_ops.append(span3)
+print(colored("Page 2 product's SKU IDs for","green"),len(Page_2),colored("products:","green"),page_2_ops)
+line19 = "Page 2 product's SKU IDs for", page_2_ops
+lst_excel.append(line19)
+time.sleep(5)
+#############open 3 product detail page###################
+
+driver.execute_script("window.scrollTo(0, 2000)","")
+Move_page2= driver.find_element_by_link_text("1")
+Move_page2.click()
+time.sleep(2)
+driver.refresh()
+time.sleep(2)
+driver.execute_script("window.scrollTo(0, 1000)","")
+time.sleep(5)
+
+click_product1= driver.find_element_by_link_text("EMERALD (COLOMBIAN) - SUPER LUXURY").click()
+time.sleep(3)
+click1=driver.title
+time.sleep(1)
+driver.back()
+driver.back()
+driver.refresh()
+
+driver.execute_script("window.scrollTo(0, 1000)","")
+click_product2= driver.find_element_by_link_text("EMERALD (COLOMBIAN) - LUXURY")
+click_product2.click()
+time.sleep(3)
+click2=driver.title
+driver.back()
+time.sleep(3)
+driver. refresh()
+driver.execute_script("window.scrollTo(0, 1000)","")
+
+click_product3= driver.find_element_by_link_text("EMERALD (COLOMBIAN) - ECONOMY").click()
+time.sleep(3)
+click3= driver.title
+
+time.sleep(3)
+driver. refresh()
+time.sleep(3)
+driver. refresh()
+time.sleep(3)
+driver. refresh()
+
+if click1=="Emerald (Colombian) - Super Luxury Quality | GemPundit.com" and click2=="Emerald (Colombian) - Luxury Quality | GemPundit.com" and click3=="Emerald (Colombian) - Economy Quality | GemPundit.com":
+    print(colored("After clicking on 3 products, correct product detail page is opening","green"))
+    line15 = "After clicking on3 clicked products same clicked product detail page is open", click1, ",", click2, ",",click3
+    lst_excel.append(line15)
+else:
+    print(colored("Some of the product detail pages are not opening correctly, need to check manually","red"))
+    line16 = "Some of the headers on website are not clickable,please check all the headers manually",click1, ",", click2, ",",click3
+    lst_excel.append(line16)
+#####Footer confirmation#######
+
+sticky_footer=driver.find_elements_by_class_name('footer-main')
+s = len(sticky_footer)
+if(s>0):
+    print(colored("Same Footer is reflecting on Home , Category & product detail page", "green"))
+else:
+    print(colored("Found some issue, please check the footer on all the pages", "red"))
+time.sleep(5)
+
+###########Add product in cart #########################################
+time.sleep(2)
+weight=driver.find_element_by_id("select_5353454")
+drp= Select(weight)
+drp.select_by_index(2)
+all_options=drp.options
+
+certification= driver.find_element_by_id("select_5353424")
+drp_cert=Select(certification)
+drp_cert.select_by_index(2)
+
+pooja=driver.find_element_by_id("select_5353425")
+drp_pj=Select(pooja)
+drp_pj.select_by_index(2)
+
+driver.execute_script("window.scrollTo( 0, 300)","")
+time.sleep(1)
+ring=driver.find_element(By.ID, "options_8280774_2").click()
+
+
+metal= driver.find_element_by_id("select_8280776")
+drp_metal=Select(metal)
+drp_metal.select_by_index(2)
+all_options_metal=drp_metal.options
+
+design=driver.find_element_by_id("options_8280780_1").click()
+
+size_system= driver.find_element_by_id("select_8280808")
+drp_size=Select(size_system)
+drp_size.select_by_index(2)
+all_options_size=drp_size.options
+
+size= driver.find_element_by_id("select_8280809")
+drp_stype=Select(size)
+drp_stype.select_by_index(6)
+all_options_stype=drp_stype.options
+time.sleep(2)
+
+# Add product in cart #
+
+addtocart=driver.find_element_by_id("addtobagcart").click()
+time.sleep(10)
+driver.get("https://www.gempundit.com/checkout/cart/")
+driver.implicitly_wait(10)
+
+################Click on view cart##########
+driver.get("https://www.gempundit.com/checkout/onepage/")
+time.sleep(10)
+##########Process as a guest##########
+cols= driver.find_element_by_id("login:guest").click()
+
+#########Fill address################
+
+First_name=driver.find_element_by_id("billing:firstname")
+Last_name=driver.find_element_by_id("billing:lastname")
+email=driver.find_element_by_id("billing:email")
+Phone=driver.find_element_by_id("billing:telephone")
+Addressline1=driver.find_element_by_id("billing:street1")
+Addressline2=driver.find_element_by_id("billing:street2")
+City=driver.find_element_by_id("billing:city")
+Zipcode=driver.find_element_by_id("billing:postcode")
+
+First_name.send_keys("Test")
+Last_name.send_keys("Test")
+email.send_keys("alak@gempundit.com")
+Phone.send_keys("9876543210")
+Addressline1.send_keys("D9, A/4 Ardee city")
+Addressline2.send_keys("3rd floor")
+
+Country_name = driver.find_element_by_id("billing:country_id")
+country_dd = Select(Country_name)
+country_dd.select_by_index(233)
+time.sleep(2)
+
+State13= driver.find_element_by_id("billing:region_id")
+drp=Select(State13)
+drp.select_by_index(18)
+all_options_state=drp.options
+
+City.send_keys("Florida")
+Zipcode.send_keys("32089")
+Clickcontinue=driver.find_element_by_id("custom_checkstate").click()
+Continuebutton=driver.find_element_by_id("custom_checkstate")
+print(colored("Open the checkout page & check all address text columns are reflecting:", "green"), Continuebutton.is_enabled())
+line26 = "Open the checkout page & check all address text columns are reflecting", Continuebutton.is_enabled()
+lst_excel.append(line26)
+################Shipping section#####################
+time.sleep(10)
+shopping_option= driver.find_element_by_xpath("//*[@id='checkout-shipping-method-load']/dl/dd/ul/li/label").text
+print(colored("Shopping option is reflecting for US address:", "green"), shopping_option)
+line27 = "Shopping option is reflecting for US address", shopping_option
+lst_excel.append(line27)
+shipping_button=driver.find_element_by_id("shipping-method-buttons-container")
+shipping_button.click()
+driver.execute_script("window.scrollTo(0, 600)","")
+time.sleep(10)
+#print(colored(" All payment mode for US address", "red"), payment_modes)
+
+ccavenue_option= driver.find_element_by_id("dt_method_ccavenuepay").text
+paypal_option= driver.find_element_by_id("dt_method_paypal_standard").text
+BT_option= driver.find_element_by_id("dt_method_banktransfer").text
+print( colored("All payment options name:", "green"), ccavenue_option,",", paypal_option,",", BT_option)
+line28 = "All payment options name:", ccavenue_option,paypal_option, BT_option
+lst_excel.append(line28)
+
+######custom duties##########
+time.sleep(10)
+driver.execute_script("window.scrollTo(0, 300)","")
+custom_duties= driver.find_element_by_xpath("/html/body/div[3]/div/div[3]/div[2]/div/div[2]/ol/li[5]/div[2]/form/div/dl/div[4]/form/ol/li/p/input").click()
+custom_duties1=driver.find_element_by_xpath("/html/body/div[3]/div/div[3]/div[2]/div/div[2]/ol/li[5]/div[2]/form/div/dl/div[4]/form/ol/li/p/input").is_selected()
+print(colored("Custom duties is selected after click:", "green"), custom_duties1)
+line29 = "Custom duties is selected after click:", custom_duties1
+lst_excel.append(line29)
+#####paypal order###############
+time.sleep(3)
+paypal_option_select= driver.find_element_by_id("p_method_paypal_standard").click()
+time.sleep(3)
+driver.execute_script("window.scrollTo(600, 900)","")
+# place_order= driver.find_element_by_id("placeorderbutton").click()
+# ######Paypal title ############
+#
+# driver.implicitly_wait(10)
+# print(colored(" check CC PayPal page is getting open", "red"),driver.title)
+
+#######Select multiple filter####################
+
+driver.execute_script("window.open('https://www.gempundit.com', 'new window')")
+window_after = driver.window_handles[1]
+
+driver.switch_to.window(window_after)
+time.sleep(10)
+
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.LINK_TEXT, "GEMSTONES")
+action.move_to_element(parent_level_menu).perform()
+child_level_menu = driver.find_element (By.LINK_TEXT, "Emerald (Panna)")
+child_level_menu.click()
+time.sleep(3)
+
+total_products= driver.find_element_by_class_name("product-number").text
+print(colored("Total product count before Applying filter:", "green"), total_products)
+line17 = "Total product count after before Applying filter:", total_products
+lst_excel.append(line17)
+
+driver.execute_script("window.scrollTo(0, 300)","")
+Price_infilter= driver
+
+filter1= driver.find_element_by_class_name("img_Zambia").click()
+time.sleep(10)
+filterone= driver.find_element_by_id("narrow-by-list-0").is_displayed()
+
+filter2= driver.find_element_by_class_name("img_Unheated").click()
+time.sleep(10)
+filtertwo= driver.find_element_by_id("narrow-by-list-0").is_displayed()
+driver.execute_script("window.scrollTo(0, 450)","")
+
+clickonslidebutton=driver.find_element_by_class_name("slick-next").click()
+time.sleep(2)
+driver.execute_script("window.scrollTo(0, 300)","")
+filter3= driver.find_element_by_class_name("img_9x7").click()
+time.sleep(10)
+filterthree= driver.find_element_by_id("narrow-by-list-0").is_displayed()
+
+print( colored("Price, Origin, Treatment & Dimesnison (All 4 clicked filter should be selected):","green"), filterone,filtertwo,filterthree)
+line30 = "Price, Origin, Treatment & Dimesnison (All 4 clicked filter should be selected):", filterone,filtertwo,filterthree
+lst_excel.append(line30)
+input_value1= driver.find_element_by_class_name("m-to").clear()
+input_value= driver.find_element_by_class_name("m-to").send_keys("5000")
+time.sleep(10)
+total_products= driver.find_element_by_class_name("product-number").text
+print(colored("After filter Selection, total products count:", "green"), total_products)
+line31 = " After filter Selection, total products count:", total_products
+lst_excel.append(line31)
+time.sleep(15)
+driver.refresh()
+
+##########open diffrent category page##########################
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.LINK_TEXT, "GEMSTONES")
+action.move_to_element(parent_level_menu).perform()
+child_level_menu = driver.find_element (By.LINK_TEXT, "Emerald (Panna)")
+child_level_menu.click()
+time.sleep(10)
+
+H1 = driver.find_elements_by_tag_name("h1")
+print(colored("Total H1 Tags on Emerald Category Page:", "green"),len(H1))
+
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.LINK_TEXT, "GEMSTONES")
+action.move_to_element(parent_level_menu).perform()
+child_level_menu = driver.find_element (By.LINK_TEXT, "Turquoise (Firoza)")
+child_level_menu.click()
+time.sleep(5)
+H1 = driver.find_elements_by_tag_name("h1")
+print(colored("Total H1 Tags on Turquoise (Firoza) Category Page:", "green"),len(H1))
+
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.LINK_TEXT, "JEWELLERY")
+action.move_to_element(parent_level_menu).perform()
+child_level_menu = driver.find_element (By.LINK_TEXT, "Blue Sapphire Jewelry")
+child_level_menu.click()
+time.sleep(5)
+H1 = driver.find_elements_by_tag_name("h1")
+print(colored("Total H1 Tags on Blue Sapphire Jewelry Category Page:", "green"),len(H1))
+time.sleep(5)
+
+action = ActionChains(driver);
+parent_level_menu = driver.find_element (By.LINK_TEXT, "JEWELLERY")
+action.move_to_element(parent_level_menu).perform()
+child_level_menu = driver.find_element (By.LINK_TEXT, "Cats Eye Rings")
+child_level_menu.click()
+time.sleep(5)
+H1 = driver.find_elements_by_tag_name("h1")
+print(colored("Total H1 Tags on Cats Eye Rings Category Page:", "green"),len(H1))
+time.sleep(5)
+
+output_df=pd.DataFrame(lst_excel)
+output_df.to_excel("WeeklyTesting.xlsx",index=False,sheet_name=str(today),header=None)
+
+driver.close()

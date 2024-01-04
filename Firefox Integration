@@ -1,0 +1,19 @@
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+import time
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+from termcolor import colored
+from selenium.webdriver.support.select import Select
+
+
+options = Options()
+options.binary_location = r"C:\Users\Alak\AppData\Local\Mozilla Firefox\firefox.exe"
+driver = webdriver.Firefox(executable_path=r'C:\Users\Alak\AppData\Local\Programs\Python\Python39\geckodriver.exe', firefox_options=options)
+driver.get("https://accounts.lambdatest.com/login")
+driver.maximize_window()
+driver.implicitly_wait(10)
+# driver.get('about:preferences')
+# driver.execute_script('about.preferences.setDefaultZoom(0.3);')
+
